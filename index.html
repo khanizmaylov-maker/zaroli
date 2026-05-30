@@ -19,6 +19,18 @@
             background-color: #0f172a; /* Slate 900 */
             color: #e2e8f0; /* Slate 200 */
         }
+
+        .app-container {
+            height: 90vh;
+            max-height: 850px;
+        }
+
+        @media (max-width: 640px) {
+            .app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
         
         .glass-panel {
             background: rgba(30, 41, 59, 0.7);
@@ -73,6 +85,28 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Legal Text Formatting */
+        .legal-text h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            margin-top: 1.5rem;
+        }
+        .legal-text p, .legal-text ul {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        .legal-text ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+        }
+        .legal-text li {
+            margin-bottom: 0.5rem;
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
@@ -82,11 +116,11 @@
     <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
     <!-- Main Container -->
-    <main class="w-full max-w-md glass-panel rounded-2xl shadow-2xl overflow-hidden relative min-h-[600px] flex flex-col">
+    <main class="app-container w-full max-w-md glass-panel rounded-2xl shadow-2xl overflow-hidden relative flex flex-col">
         
         <!-- Header -->
-        <header class="p-6 border-b border-white/10 flex items-center justify-between bg-slate-900/50">
-            <div class="flex items-center gap-2">
+        <header class="p-6 border-b border-white/10 flex items-center justify-between bg-slate-900/50 z-10 shrink-0">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('home')">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">Z</div>
                 <h1 class="font-bold text-xl tracking-tight">Zaroli</h1>
             </div>
@@ -96,7 +130,7 @@
         </header>
 
         <!-- Content Area -->
-        <div id="content-area" class="flex-1 p-6 overflow-y-auto relative">
+        <div id="content-area" class="flex-1 min-h-0 p-6 overflow-y-auto relative scroll-smooth">
             
             <!-- VIEW: HOME -->
             <div id="view-home" class="space-y-6 fade-in">
@@ -111,15 +145,14 @@
 
                 <div class="space-y-3">
                     <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="text-sm text-slate-300">Доступ ко всем будущим функциям</span>
+                        <svg class="w-5 h-5 text-green-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <div class="flex flex-col">
+                            <span class="text-sm text-slate-300">Доступ ко всем будущим функциям</span>
+                            <span class="text-xs text-slate-500 mt-1 ml-1">• Синхронизация: Телефон + Компьютер</span>
+                        </div>
                     </div>
                     <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="text-sm text-slate-300">Синхронизация: Телефон + Компьютер</span>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="w-5 h-5 text-green-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         <span class="text-sm text-slate-300">Цена не изменится никогда</span>
                     </div>
                 </div>
@@ -333,34 +366,161 @@
                     <span class="text-sm">Назад</span>
                 </div>
 
-                <h2 class="text-xl font-bold text-white">Помощь</h2>
+                <h2 class="text-xl font-bold text-white">Помощь и Документы</h2>
 
-                <div class="space-y-2">
-                    <a href="#" class="block p-4 bg-slate-800/50 rounded-xl border border-white/5 hover:bg-slate-800 transition-colors group">
-                        <div class="flex items-center justify-between">
-                            <span class="font-medium text-slate-200">Написать в поддержку</span>
-                            <svg class="w-5 h-5 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                        </div>
-                    </a>
-                    <a href="#" class="block p-4 bg-slate-800/50 rounded-xl border border-white/5 hover:bg-slate-800 transition-colors group">
+                <div class="space-y-3">
+                    <button onclick="navigateTo('faq')" class="w-full text-left p-4 bg-slate-800/50 rounded-xl border border-white/5 hover:bg-slate-800 transition-colors group">
                         <div class="flex items-center justify-between">
                             <span class="font-medium text-slate-200">FAQ (Частые вопросы)</span>
-                            <svg class="w-5 h-5 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            <svg class="w-5 h-5 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                         </div>
-                    </a>
-                    <a href="#" class="block p-4 bg-slate-800/50 rounded-xl border border-white/5 hover:bg-slate-800 transition-colors group">
+                    </button>
+                    
+                    <button onclick="navigateTo('offer')" class="w-full text-left p-4 bg-slate-800/50 rounded-xl border border-white/5 hover:bg-slate-800 transition-colors group">
                         <div class="flex items-center justify-between">
-                            <span class="font-medium text-slate-200">Скачать в RuStore</span>
-                            <svg class="w-5 h-5 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            <span class="font-medium text-slate-200">Публичная оферта</span>
+                            <svg class="w-5 h-5 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                         </div>
-                    </a>
+                    </button>
+
+                    <button onclick="navigateTo('privacy')" class="w-full text-left p-4 bg-slate-800/50 rounded-xl border border-white/5 hover:bg-slate-800 transition-colors group">
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium text-slate-200">Политика конфиденциальности</span>
+                            <svg class="w-5 h-5 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </div>
+                    </button>
                 </div>
+            </div>
+
+            <!-- VIEW: FAQ CONTENT -->
+            <div id="view-faq" class="hidden space-y-6 fade-in legal-text">
+                <div class="flex items-center gap-2 mb-4 cursor-pointer text-slate-400 hover:text-white transition-colors" onclick="navigateTo('help')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    <span class="text-sm">Назад</span>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-6">Частые вопросы (FAQ)</h2>
+                
+                <h3>1. Что такое Zaroli?</h3>
+                <p>Zaroli — это приложение для безопасного хранения данных, ключей, заметок и конфиденциальной информации. Покупка цифрового ключа открывает пожизненный доступ ко всем функциям приложения.</p>
+
+                <h3>2. Как происходит оплата?</h3>
+                <p>Оплата осуществляется через платёжный сервис YooKassa. Вы можете использовать банковскую карту или другие доступные способы оплаты.</p>
+
+                <h3>3. Когда я получу цифровой ключ?</h3>
+                <p>Сразу после успешной оплаты ключ автоматически отправляется на указанный вами email.</p>
+
+                <h3>4. Что делать, если письмо с ключом не пришло?</h3>
+                <p>Проверьте папку «Спам». Если письма нет — напишите на <a href="mailto:mangaseiyuu@gmail.com" class="text-blue-400 hover:underline">mangaseiyuu@gmail.com</a>, и ключ будет отправлен повторно.</p>
+
+                <h3>5. Можно ли вернуть деньги?</h3>
+                <p>Да, возврат возможен в случае технической ошибки или невозможности активации ключа. Для оформления возврата напишите в поддержку.</p>
+
+                <h3>6. Могу ли я использовать ключ на нескольких устройствах?</h3>
+                <p>Нет. Ключ можно активировать только на одном устройстве одновременно. Но вы можете перенести ключ на другое устройство, отвязав его на сайте.</p>
+
+                <h3>7. Ключ действует навсегда?</h3>
+                <p>Да, покупка даёт пожизненный доступ к приложению Zaroli.</p>
+
+                <h3>8. Как связаться с поддержкой?</h3>
+                <p>По всем вопросам пишите на email: <a href="mailto:mangaseiyuu@gmail.com" class="text-blue-400 hover:underline">mangaseiyuu@gmail.com</a>.</p>
+                
+                <div class="text-center text-xs text-slate-500 mt-8">Последнее обновление: 31 мая 2026 г.</div>
+            </div>
+
+            <!-- VIEW: OFFER CONTENT -->
+            <div id="view-offer" class="hidden space-y-6 fade-in legal-text">
+                <div class="flex items-center gap-2 mb-4 cursor-pointer text-slate-400 hover:text-white transition-colors" onclick="navigateTo('help')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    <span class="text-sm">Назад</span>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">Публичная оферта</h2>
+                <p class="text-xs text-slate-400 mb-6">Настоящая публичная оферта является официальным предложением самозанятого гражданина Хан И. (далее — «Продавец») заключить договор купли‑продажи цифрового ключа для приложения Zaroli.</p>
+
+                <h3>1. Общие положения</h3>
+                <p>Оплачивая товар, Покупатель принимает условия настоящей оферты. Оплата осуществляется через платёжный сервис YooKassa.</p>
+
+                <h3>2. Предмет договора</h3>
+                <p>Продавец предоставляет Покупателю цифровой ключ для активации приложения Zaroli. Покупатель обязуется оплатить стоимость ключа.</p>
+
+                <h3>3. Порядок оплаты и получения товара</h3>
+                <p>Оплата производится онлайн. После успешной оплаты цифровой ключ автоматически отправляется на указанный Покупателем email.</p>
+
+                <h3>4. Возврат и поддержка</h3>
+                <p>Возврат возможен в случае технической ошибки или невозможности активации ключа. Для обращения в поддержку используйте email: <a href="mailto:mangaseiyuu@gmail.com" class="text-blue-400 hover:underline">mangaseiyuu@gmail.com</a>.</p>
+
+                <div class="bg-slate-800/50 p-4 rounded-xl border border-white/5 mt-4">
+                    <h3 class="mt-0">5. Реквизиты самозанятого</h3>
+                    <ul class="list-none pl-0 space-y-1 text-slate-400">
+                        <li>Самозанятый: <span class="text-slate-200">Хан И.</span></li>
+                        <li>Статус: <span class="text-slate-200">плательщик НПД (самозанятый)</span></li>
+                        <li>ИНН: <span class="text-slate-200">665813495240</span></li>
+                        <li>Email: <a href="mailto:mangaseiyuu@gmail.com" class="text-blue-400 hover:underline">mangaseiyuu@gmail.com</a></li>
+                        <li>Сайт: <a href="https://khanizmaylov-maker.github.io/zaroli/" target="_blank" class="text-blue-400 hover:underline">zaroli.ru</a></li>
+                    </ul>
+                </div>
+                
+                <div class="text-center text-xs text-slate-500 mt-8">Дата публикации оферты: 31 мая 2026 г.</div>
+            </div>
+
+            <!-- VIEW: PRIVACY CONTENT -->
+            <div id="view-privacy" class="hidden space-y-6 fade-in legal-text">
+                <div class="flex items-center gap-2 mb-4 cursor-pointer text-slate-400 hover:text-white transition-colors" onclick="navigateTo('help')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    <span class="text-sm">Назад</span>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">Политика конфиденциальности</h2>
+                <p class="text-xs text-slate-400 mb-6">Настоящая политика конфиденциальности описывает порядок обработки персональных данных, предоставляемых пользователями при использовании сайта и сервиса покупки цифрового ключа для приложения Zaroli.</p>
+
+                <h3>1. Общие положения</h3>
+                <p>Обработка персональных данных осуществляется самозанятым гражданином Хан И. (далее — «Оператор») в соответствии с Федеральным законом РФ №152‑ФЗ «О персональных данных».</p>
+
+                <h3>2. Какие данные собираются</h3>
+                <p>При оформлении покупки могут собираться следующие данные:</p>
+                <ul>
+                    <li>Имя пользователя (если указано);</li>
+                    <li>Email для отправки цифрового ключа;</li>
+                    <li>Информация об оплате, передаваемая YooKassa (без передачи банковских данных Оператору);</li>
+                    <li>Технические данные (IP‑адрес, cookies, данные браузера).</li>
+                </ul>
+
+                <h3>3. Цели обработки данных</h3>
+                <p>Персональные данные используются для:</p>
+                <ul>
+                    <li>Отправки цифрового ключа после оплаты;</li>
+                    <li>Обратной связи и технической поддержки;</li>
+                    <li>Выполнения требований законодательства РФ.</li>
+                </ul>
+
+                <h3>4. Передача данных третьим лицам</h3>
+                <p>Персональные данные могут передаваться только платёжному сервису YooKassa для обработки платежа. Банковские данные пользователя Оператору не передаются.</p>
+
+                <h3>5. Хранение и защита данных</h3>
+                <p>Оператор принимает необходимые организационные и технические меры для защиты персональных данных от несанкционированного доступа, изменения или удаления.</p>
+
+                <h3>6. Права пользователя</h3>
+                <p>Пользователь имеет право:</p>
+                <ul>
+                    <li>Запросить информацию о своих данных;</li>
+                    <li>Требовать исправления или удаления данных;</li>
+                    <li>Отозвать согласие на обработку данных.</li>
+                </ul>
+
+                <div class="bg-slate-800/50 p-4 rounded-xl border border-white/5 mt-4">
+                    <h3 class="mt-0">7. Контакты для обращений</h3>
+                    <ul class="list-none pl-0 space-y-1 text-slate-400">
+                        <li>Самозанятый: <span class="text-slate-200">Хан И.</span></li>
+                        <li>Email: <a href="mailto:mangaseiyuu@gmail.com" class="text-blue-400 hover:underline">mangaseiyuu@gmail.com</a></li>
+                        <li>Сайт: <a href="https://khanizmaylov-maker.github.io/zaroli/" target="_blank" class="text-blue-400 hover:underline">zaroli.ru</a></li>
+                    </ul>
+                </div>
+                
+                <div class="text-center text-xs text-slate-500 mt-8">Дата публикации политики: 31 мая 2026 г.</div>
             </div>
 
         </div>
 
         <!-- Bottom Navigation Menu -->
-        <nav class="bg-slate-900 border-t border-white/10 p-2">
+        <nav class="bg-slate-900 border-t border-white/10 p-2 z-10 shrink-0">
             <div class="grid grid-cols-5 gap-1">
                 <button onclick="navigateTo('home')" class="nav-btn active flex flex-col items-center justify-center p-2 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-white/5 transition-all" data-target="home">
                     <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
@@ -417,7 +577,7 @@
         // --- NAVIGATION LOGIC ---
         function navigateTo(viewId) {
             // Hide all views
-            const views = ['home', 'buy', 'payment-sim', 'license', 'auth', 'transfer', 'keys', 'help'];
+            const views = ['home', 'buy', 'payment-sim', 'license', 'auth', 'transfer', 'keys', 'help', 'faq', 'offer', 'privacy'];
             views.forEach(id => {
                 const el = document.getElementById(`view-${id}`);
                 if(el) el.classList.add('hidden');
@@ -448,6 +608,9 @@
             if (viewId === 'keys') {
                 updateKeysView();
             }
+            
+            // Scroll to top
+            document.getElementById('content-area').scrollTop = 0;
         }
 
         // --- BUY FLOW ---
