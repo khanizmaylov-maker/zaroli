@@ -568,7 +568,7 @@
 
     </main>
 
-    <script>
+<script>
 document.getElementById("buy-button").addEventListener("click", goPayment);
 
 async function goPayment() {
@@ -585,7 +585,7 @@ async function goPayment() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         amount: "99.00",
-        description: "Пожизненный ключ Zaroli (" + email + ")"
+        description: `Пожизненный ключ Zaroli (${email})`
       })
     });
 
@@ -603,5 +603,6 @@ async function goPayment() {
   }
 }
 </script>
+
 </body>
 </html>
