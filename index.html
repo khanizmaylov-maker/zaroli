@@ -268,15 +268,21 @@
                 const res = await fetch(API_GATEWAY_URL + "/create-payment?email=" + encodeURIComponent(currentUserEmail), {method: "GET"});
                 const data = await res.json();
                 if (data.keys && data.keys.length > 0) {
-                    list.innerHTML = data.keys.map(k => `
+                    list.innerHTML = data.keys.map(k => {
+                        const isBound = k.device_id && k.device_id !== '';
+                        const statusText = isBound ? 'Привязан' : 'Свободен';
+                        const statusColor = isBound ? 'text-green-400' : 'text-yellow-400';
+                        const deviceInfo = isBound ? `<div class="text-xs text-slate-500 mt-1">Устройство: <span class="text-slate-400 font-mono">${k.device_id}</span></div>` : '';
+                        return `
                         <div class="key-card rounded-xl p-4">
                             <div class="flex items-center justify-between mb-2">
                                 <code class="text-blue-400 font-bold text-lg tracking-wider">${k.key}</code>
-                                <span class="text-xs ${k.status === 'active' ? 'text-green-400' : 'text-red-400'}">${k.status === 'active' ? 'Активен' : 'Отвязан'}</span>
+                                <span class="text-xs ${statusColor}">${statusText}</span>
                             </div>
                             <div class="text-xs text-slate-500">ID: ${k.payment_id}</div>
+                            ${deviceInfo}
                         </div>
-                    `).join('');
+                    `;}).join('');
                 } else {
                     list.innerHTML = '<p class="text-slate-500 text-sm">Ключи не найдены. Купите первый ключ!</p>';
                 }
