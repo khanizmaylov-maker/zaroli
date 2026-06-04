@@ -449,13 +449,11 @@
             list.innerHTML = '<p class="text-slate-500 text-sm">Загрузка…</p>';
 
             try {
-                const res = await fetch(API_GATEWAY_URL + "/get-keys", {
+                // Добавляем timestamp для предотвращения кэширования
+                const timestamp = Date.now();
+                const res = await fetch(API_GATEWAY_URL + "/get-keys?_=" + timestamp, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Cache-Control": "no-cache, no-store, must-revalidate",
-                        "Pragma": "no-cache"
-                    },
+                    headers: {"Content-Type": "application/json"},
                     body: JSON.stringify({token: appState.token})
                 });
                 
