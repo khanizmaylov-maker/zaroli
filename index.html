@@ -301,15 +301,20 @@
         
         /**
          * Форматирование ключа при вводе (авто-добавление дефисов)
+         * Формат: ZRL-XXXX-XXXX-XXXX
          * @param {HTMLInputElement} input - Элемент input для форматирования
          */
         function formatKeyInput(input) {
             let value = input.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
-            const parts = [];
-            for (let i = 0; i < value.length && i < 12; i += 4) {
-                parts.push(value.substring(i, i + 4));
+            // Форматируем как ZRL-XXXX-XXXX-XXXX
+            let formatted = '';
+            for (let i = 0; i < value.length && i < 14; i++) {
+                if (i === 3 || i === 7 || i === 11) {
+                    formatted += '-';
+                }
+                formatted += value[i];
             }
-            input.value = parts.join('-');
+            input.value = formatted;
         }
         
         /**
