@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Zaroli — Пожизненный доступ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -504,12 +507,16 @@
             }
 
             try {
-                const res = await fetch(API_GATEWAY_URL + "/create-payment?email=" + encodeURIComponent(appState.email), {method: "GET"});
+                const res = await fetch(API_GATEWAY_URL + "/restore-keys", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({token: appState.token})
+                });
                 const data = await res.json();
-                if (data.count > 0) {
-                    alert(`Отправлено ${data.count} ключей на ${appState.email}. Проверьте почту (и папку Спам).`);
+                if (res.ok) {
+                    alert(data.message || "Ключи отправлены на email. Проверьте почту (и папку Спам).");
                 } else {
-                    alert("Ключи не найдены для этого email.");
+                    alert("Ошибка: " + (data.error || "Не удалось отправить ключи"));
                 }
             } catch(e) {
                 alert("Ошибка: " + e.message);
