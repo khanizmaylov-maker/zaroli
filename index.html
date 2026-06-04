@@ -300,20 +300,6 @@
         }
         
         /**
-         * Форматирование ключа при вводе (авто-добавление дефисов)
-         * @param {string} value - Введённое значение
-         * @returns {string} - Отформатированный ключ
-         */
-        function formatKeyInput(value) {
-            const cleaned = value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
-            const parts = [];
-            for (let i = 0; i < cleaned.length && i < 12; i += 4) {
-                parts.push(cleaned.substring(i, i + 4));
-            }
-            return parts.join('-');
-        }
-        
-        /**
          * Показать сообщение об ошибке пользователю
          * @param {string} message - Сообщение об ошибке
          */
@@ -723,19 +709,6 @@
         // ── Инициализация ──────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById("buy-button")?.addEventListener("click", goPayment);
-            
-            // ИСПРАВЛЕНИЕ: Автоформатирование ввода ключа
-            const keyInput = document.getElementById("transfer-key-input");
-            keyInput?.addEventListener("input", function(e) {
-                const cursorPosition = this.selectionStart;
-                const oldValue = this.value;
-                const newValue = formatKeyInput(oldValue);
-                this.value = newValue;
-                
-                // Корректировка позиции курсора
-                const diff = newValue.length - oldValue.length;
-                this.setSelectionRange(cursorPosition + diff, cursorPosition + diff);
-            });
             
             // Восстанавливаем сессию если есть токен
             if (appState.token && appState.email) {
