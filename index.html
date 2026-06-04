@@ -459,10 +459,14 @@
                 
                 if (res.ok && data.keys && data.keys.length > 0) {
                     list.innerHTML = data.keys.map(k => {
-                        const isBound = k.device_id && k.device_id !== '';
-                        const statusText = isBound ? 'Привязан' : 'Свободен';
-                        const statusColor = isBound ? 'text-green-400' : 'text-yellow-400';
-                        const deviceInfo = isBound ? `<div class="text-xs text-slate-500 mt-1">Устройство: <span class="text-slate-400 font-mono">${k.device_id}</span></div>` : '';
+                        // Определяем статус: сначала по полю status от сервера, потом по device_id
+                        const status = (k.status || '').toLowerCase();
+                        const hasDevice = k.device_id && k.device_id !== '';
+                        const isBound = status === 'active' || status === 'bound' || hasDevice;
+                        const statusText = isBound ? 'Активен' : (status === 'detached' ? 'Отвязан' : 'Свободен');
+                        const statusColor = isBound ? 'text-green-400' : (status === 'detached' ? 'text-orange-400' : 'text-yellow-400');
+                        const deviceInfo = hasDevice ? `<div class="text-xs text-slate-500 mt-1">Устройство: <span class="text-slate-400 font-mono">${k.device_id}</span></div>` : '';
+                        const purchaseDate = k.purchase_date ? `<div class="text-xs text-slate-500">Дата: ${new Date(k.purchase_date).toLocaleDateString('ru-RU')}</div>` : '';
                         return `
                         <div class="key-card rounded-xl p-4">
                             <div class="flex items-center justify-between mb-2">
@@ -470,6 +474,7 @@
                                 <span class="text-xs ${statusColor}">${statusText}</span>
                             </div>
                             <div class="text-xs text-slate-500">ID: ${k.payment_id || 'Н/Д'}</div>
+                            ${purchaseDate}
                             ${deviceInfo}
                         </div>
                     `;}).join('');
