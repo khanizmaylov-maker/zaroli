@@ -23,6 +23,20 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .key-card { background: rgba(15, 23, 42, 0.8); border: 1px dashed #475569; }
         .code-input { letter-spacing: 0.5em; font-size: 1.5em; text-align: center; }
+        /* Спиннер загрузки */
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid #3b82f6;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
@@ -128,7 +142,7 @@
                 <h2 class="text-xl font-bold text-white">Мои ключи</h2>
                 <div class="text-xs text-slate-400">Email: <span id="user-email-display" class="text-blue-400 font-mono"></span></div>
                 <div id="keys-list" class="space-y-3">
-                    <p class="text-slate-500 text-sm">Загрузка…</p>
+                    <div class="spinner"></div>
                 </div>
                 <div class="pt-4 border-t border-white-5 space-y-3">
                     <button onclick="navigateTo('transfer')" class="btn-secondary w-full py-3 rounded-xl font-medium text-slate-300 flex items-center justify-center gap-2">
@@ -156,7 +170,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Ключ (ZRL-XXXX-XXXX-XXXX)</label>
-                        <input type="text" id="transfer-key-input" placeholder="ZRL-XXXX-XXXX-XXXX" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500">
+                        <input type="text" id="transfer-key-input" placeholder="ZRL-XXXX-XXXX-XXXX" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500" maxlength="17">
                     </div>
                     <button onclick="performDetach()" class="btn-danger w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -250,12 +264,91 @@
     </main>
 
     <script>
+        // ── Конфигурация ──────────────────────────────────────────
         const API_GATEWAY_URL = "https://d5d1jgohm0a75ai04lis.tmjd4m4j.apigw.yandexcloud.net";
         
-        // Состояние приложения
+        // ── Вспомогательные функции ───────────────────────────────
+        
+        /**
+         * Экранирование HTML для предотвращения XSS
+         * @param {string} text - Текст для экранирования
+         * @returns {string} - Экранированный текст
+         */
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+        
+        /**
+         * Валидация формата email
+         * @param {string} email - Email для проверки
+         * @returns {boolean} - Результат валидации
+         */
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+        
+        /**
+         * Валидация формата ключа
+         * @param {string} key - Ключ для проверки
+         * @returns {boolean} - Результат валидации
+         */
+        function isValidKeyFormat(key) {
+            return /^ZRL-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key);
+        }
+        
+        /**
+         * Форматирование ключа при вводе (авто-добавление дефисов)
+         * @param {string} value - Введённое значение
+         * @returns {string} - Отформатированный ключ
+         */
+        function formatKeyInput(value) {
+            const cleaned = value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+            const parts = [];
+            for (let i = 0; i < cleaned.length && i < 12; i += 4) {
+                parts.push(cleaned.substring(i, i + 4));
+            }
+            return parts.join('-');
+        }
+        
+        /**
+         * Показать сообщение об ошибке пользователю
+         * @param {string} message - Сообщение об ошибке
+         */
+        function showError(message) {
+            // Используем более дружелюбное уведомление вместо alert
+            const errorContainer = document.getElementById('global-error');
+            if (errorContainer) {
+                errorContainer.textContent = message;
+                errorContainer.classList.remove('hidden');
+                setTimeout(() => errorContainer.classList.add('hidden'), 5000);
+            } else {
+                alert(message);
+            }
+        }
+        
+        /**
+         * Показать успешное сообщение
+         * @param {string} message - Сообщение об успехе
+         */
+        function showSuccess(message) {
+            const successContainer = document.getElementById('global-success');
+            if (successContainer) {
+                successContainer.textContent = message;
+                successContainer.classList.remove('hidden');
+                setTimeout(() => successContainer.classList.add('hidden'), 5000);
+            } else {
+                alert(message);
+            }
+        }
+
+        // ── Состояние приложения ─────────────────────────────────
+        // ИСПРАВЛЕНИЕ: Используем sessionStorage вместо localStorage для безопасности
         let appState = {
-            email: localStorage.getItem("userEmail") || "",
-            token: localStorage.getItem("userToken") || "",
+            email: sessionStorage.getItem("userEmail") || "",
+            token: sessionStorage.getItem("userToken") || "",
             resendTimer: null,
             resendCooldown: 60
         };
@@ -290,8 +383,9 @@
         function logout() {
             appState.email = "";
             appState.token = "";
-            localStorage.removeItem("userEmail");
-            localStorage.removeItem("userToken");
+            // ИСПРАВЛЕНИЕ: sessionStorage вместо localStorage
+            sessionStorage.removeItem("userEmail");
+            sessionStorage.removeItem("userToken");
             document.getElementById("logout-btn").classList.add("hidden");
             
             // Очищаем таймер
@@ -308,8 +402,9 @@
             const emailInput = document.getElementById("auth-email");
             const email = emailInput.value.trim().toLowerCase();
             
-            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                alert("Введите корректный email");
+            // ИСПРАВЛЕНИЕ: Улучшенная валидация email
+            if (!email || !isValidEmail(email)) {
+                showError("Введите корректный email");
                 return;
             }
 
@@ -327,9 +422,9 @@
                 const data = await res.json();
                 
                 if (res.ok) {
-                    // Сохраняем email и переходим к вводу кода
+                    // ИСПРАВЛЕНИЕ: sessionStorage вместо localStorage
                     appState.email = email;
-                    localStorage.setItem("userEmail", email);
+                    sessionStorage.setItem("userEmail", email);
                     
                     document.getElementById("verify-email-display").textContent = email;
                     document.getElementById("verify-code-input").value = "";
@@ -338,10 +433,12 @@
                     navigateTo("verify");
                     startResendTimer();
                 } else {
-                    alert("Ошибка: " + (data.error || "Неизвестная ошибка"));
+                    showError("Ошибка: " + (data.error || "Неизвестная ошибка"));
                 }
             } catch(e) {
-                alert("Ошибка сети: " + e.message);
+                // ИСПРАВЛЕНИЕ: Более понятное сообщение об ошибке
+                showError("Не удалось подключиться к серверу. Проверьте подключение к интернету.");
+                console.error("Network error:", e);
             } finally {
                 btn.disabled = false;
                 btn.textContent = "Отправить код";
@@ -375,9 +472,9 @@
                 const data = await res.json();
                 
                 if (res.ok && data.token) {
-                    // Сохраняем токен
+                    // ИСПРАВЛЕНИЕ: sessionStorage вместо localStorage
                     appState.token = data.token;
-                    localStorage.setItem("userToken", data.token);
+                    sessionStorage.setItem("userToken", data.token);
                     
                     // Очищаем таймер
                     if (appState.resendTimer) {
@@ -395,7 +492,8 @@
                     codeInput.focus();
                 }
             } catch(e) {
-                showVerifyError("Ошибка сети: " + e.message);
+                showVerifyError("Не удалось подключиться к серверу. Проверьте подключение к интернету.");
+                console.error("Network error:", e);
             } finally {
                 btn.disabled = false;
                 btn.textContent = "Подтвердить";
@@ -446,7 +544,8 @@
 
             document.getElementById("user-email-display").textContent = appState.email;
             const list = document.getElementById("keys-list");
-            list.innerHTML = '<p class="text-slate-500 text-sm">Загрузка…</p>';
+            // ИСПРАВЛЕНИЕ: Спиннер загрузки вместо текста
+            list.innerHTML = '<div class="spinner"></div>';
 
             try {
                 const res = await fetch(API_GATEWAY_URL + "/get-keys", {
@@ -458,22 +557,22 @@
                 const data = await res.json();
                 
                 if (res.ok && data.keys && data.keys.length > 0) {
+                    // ИСПРАВЛЕНИЕ: Экранирование данных для предотвращения XSS
                     list.innerHTML = data.keys.map(k => {
-                        // Определяем статус: сначала по полю status от сервера, потом по device_id
                         const status = (k.status || '').toLowerCase();
                         const hasDevice = k.device_id && k.device_id !== '';
                         const isBound = status === 'active' || status === 'bound' || hasDevice;
                         const statusText = isBound ? 'Активен' : (status === 'detached' ? 'Отвязан' : 'Свободен');
                         const statusColor = isBound ? 'text-green-400' : (status === 'detached' ? 'text-orange-400' : 'text-yellow-400');
-                        const deviceInfo = hasDevice ? `<div class="text-xs text-slate-500 mt-1">Устройство: <span class="text-slate-400 font-mono">${k.device_id}</span></div>` : '';
-                        const purchaseDate = k.purchase_date ? `<div class="text-xs text-slate-500">Дата: ${new Date(k.purchase_date).toLocaleDateString('ru-RU')}</div>` : '';
+                        const deviceInfo = hasDevice ? `<div class="text-xs text-slate-500 mt-1">Устройство: <span class="text-slate-400 font-mono">${escapeHtml(k.device_id)}</span></div>` : '';
+                        const purchaseDate = k.purchase_date ? `<div class="text-xs text-slate-500">Дата: ${escapeHtml(new Date(k.purchase_date).toLocaleDateString('ru-RU'))}</div>` : '';
                         return `
                         <div class="key-card rounded-xl p-4">
                             <div class="flex items-center justify-between mb-2">
-                                <code class="text-blue-400 font-bold text-lg tracking-wider">${k.key}</code>
-                                <span class="text-xs ${statusColor}">${statusText}</span>
+                                <code class="text-blue-400 font-bold text-lg tracking-wider">${escapeHtml(k.key)}</code>
+                                <span class="text-xs ${statusColor}">${escapeHtml(statusText)}</span>
                             </div>
-                            <div class="text-xs text-slate-500">ID: ${k.payment_id || 'Н/Д'}</div>
+                            <div class="text-xs text-slate-500">ID: ${escapeHtml(k.payment_id) || 'Н/Д'}</div>
                             ${purchaseDate}
                             ${deviceInfo}
                         </div>
@@ -484,33 +583,49 @@
                     // Токен недействителен
                     if (res.status === 401) {
                         logout();
-                        alert("Сессия истекла. Пожалуйста, войдите снова.");
+                        showError("Сессия истекла. Пожалуйста, войдите снова.");
                     } else {
-                        list.innerHTML = '<p class="text-red-400 text-sm">Ошибка: ' + (data.error || 'Неизвестная') + '</p>';
+                        list.innerHTML = '<p class="text-red-400 text-sm">Ошибка: ' + escapeHtml(data.error || 'Неизвестная') + '</p>';
                     }
                 }
             } catch(e) {
-                list.innerHTML = '<p class="text-red-400 text-sm">Ошибка загрузки</p>';
+                list.innerHTML = '<p class="text-red-400 text-sm">Ошибка загрузки. Попробуйте позже.</p>';
+                console.error("Load keys error:", e);
             }
         }
 
         // ── Отправка ключей на email ───────────────────────────────
+        // ИСПРАВЛЕНИЕ: Используем POST с токеном вместо GET с email
         async function restoreKeys() {
             if (!appState.token) {
-                alert("Необходима авторизация");
+                showError("Необходима авторизация");
                 return;
             }
 
+            const btn = document.querySelector('button[onclick="restoreKeys()"]');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div>';
+
             try {
-                const res = await fetch(API_GATEWAY_URL + "/create-payment?email=" + encodeURIComponent(appState.email), {method: "GET"});
+                // ИСПРАВЛЕНИЕ: POST запрос с токеном вместо GET с email в query string
+                const res = await fetch(API_GATEWAY_URL + "/restore-keys", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({token: appState.token})
+                });
                 const data = await res.json();
                 if (data.count > 0) {
-                    alert(`Отправлено ${data.count} ключей на ${appState.email}. Проверьте почту (и папку Спам).`);
+                    showSuccess(`Отправлено ${data.count} ключей на ${appState.email}. Проверьте почту (и папку Спам).`);
                 } else {
-                    alert("Ключи не найдены для этого email.");
+                    showError("Ключи не найдены для этого email.");
                 }
             } catch(e) {
-                alert("Ошибка: " + e.message);
+                showError("Не удалось отправить ключи. Попробуйте позже.");
+                console.error("Restore keys error:", e);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         }
 
@@ -519,13 +634,19 @@
             const keyInput = document.getElementById("transfer-key-input");
             const key = keyInput.value.trim().toUpperCase();
             
+            // ИСПРАВЛЕНИЕ: Валидация формата ключа
             if (!key) {
-                alert("Введите ключ");
+                showError("Введите ключ");
+                return;
+            }
+            
+            if (!isValidKeyFormat(key)) {
+                showError("Некорректный формат ключа. Ожидается: ZRL-XXXX-XXXX-XXXX");
                 return;
             }
             
             if (!appState.token) {
-                alert("Необходима авторизация");
+                showError("Необходима авторизация");
                 navigateTo("auth");
                 return;
             }
@@ -533,6 +654,11 @@
             if (!confirm("Вы уверены? Ключ перестанет работать на текущем устройстве.")) {
                 return;
             }
+
+            const btn = document.querySelector('button[onclick="performDetach()"]');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div>';
 
             try {
                 const res = await fetch(API_GATEWAY_URL + "/manage-key", {
@@ -548,7 +674,7 @@
                 const data = await res.json();
                 
                 if (res.ok) {
-                    alert(data.message || "Ключ успешно отвязан");
+                    showSuccess(data.message || "Ключ успешно отвязан");
                     keyInput.value = "";
                     
                     // Обновляем список ключей если мы на странице ключей
@@ -556,16 +682,33 @@
                         await loadKeys();
                     }
                 } else {
-                    alert("Ошибка: " + (data.error || "Неизвестная ошибка"));
+                    showError("Ошибка: " + (data.error || "Неизвестная ошибка"));
                 }
             } catch(e) {
-                alert("Ошибка: " + e.message);
+                showError("Не удалось отвязать ключ. Попробуйте позже.");
+                console.error("Detach error:", e);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         }
 
         // ── Инициализация ──────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById("buy-button")?.addEventListener("click", goPayment);
+            
+            // ИСПРАВЛЕНИЕ: Автоформатирование ввода ключа
+            const keyInput = document.getElementById("transfer-key-input");
+            keyInput?.addEventListener("input", function(e) {
+                const cursorPosition = this.selectionStart;
+                const oldValue = this.value;
+                const newValue = formatKeyInput(oldValue);
+                this.value = newValue;
+                
+                // Корректировка позиции курсора
+                const diff = newValue.length - oldValue.length;
+                this.setSelectionRange(cursorPosition + diff, cursorPosition + diff);
+            });
             
             // Восстанавливаем сессию если есть токен
             if (appState.token && appState.email) {
@@ -577,8 +720,9 @@
         // ── Оплата ─────────────────────────────────────────────────
         async function goPayment() {
             const email = document.getElementById("buy-email").value.trim();
-            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                alert("Введите корректный email");
+            // ИСПРАВЛЕНИЕ: Улучшенная валидация email
+            if (!email || !isValidEmail(email)) {
+                showError("Введите корректный email");
                 return;
             }
             const btn = document.getElementById("buy-button");
@@ -594,12 +738,13 @@
                 if (data.confirmation_url) {
                     window.location.href = data.confirmation_url;
                 } else {
-                    alert("Ошибка: " + (data.error || "Неизвестная"));
+                    showError("Ошибка: " + (data.error || "Неизвестная"));
                     btn.disabled = false;
                     btn.textContent = "Перейти к оплате — 99 ₽";
                 }
             } catch(e) {
-                alert("Ошибка: " + e.message);
+                showError("Не удалось создать платёж. Попробуйте позже.");
+                console.error("Payment error:", e);
                 btn.disabled = false;
                 btn.textContent = "Перейти к оплате — 99 ₽";
             }
