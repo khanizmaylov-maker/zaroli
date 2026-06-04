@@ -170,7 +170,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Ключ (ZRL-XXXX-XXXX-XXXX)</label>
-                        <input type="text" id="transfer-key-input" placeholder="ZRL-XXXX-XXXX-XXXX" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 uppercase tracking-wider" maxlength="30" style="text-transform: uppercase;">
+                        <input type="text" id="transfer-key-input" placeholder="ZRL-XXXX-XXXX-XXXX" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500" maxlength="17">
                     </div>
                     <button onclick="performDetach()" class="btn-danger w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -301,23 +301,16 @@
         
         /**
          * Форматирование ключа при вводе (авто-добавление дефисов)
-         * Формат: ZRL-XXXX-XXXX-XXXX (14 символов + 3 дефиса = 17 символов)
-         * @param {HTMLInputElement} input - Элемент input для форматирования
+         * @param {string} value - Введённое значение
+         * @returns {string} - Отформатированный ключ
          */
-        function formatKeyInput(input) {
-            // Убираем всё кроме букв и цифр, переводим в верхний регистр
-            let value = input.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
-            // Ограничиваем до 14 символов (ZRL + 12 символов ключа)
-            value = value.substring(0, 14);
-            // Форматируем как ZRL-XXXX-XXXX-XXXX
-            let formatted = '';
-            for (let i = 0; i < value.length; i++) {
-                if (i === 3 || i === 7 || i === 11) {
-                    formatted += '-';
-                }
-                formatted += value[i];
+        function formatKeyInput(value) {
+            const cleaned = value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+            const parts = [];
+            for (let i = 0; i < cleaned.length && i < 12; i += 4) {
+                parts.push(cleaned.substring(i, i + 4));
             }
-            input.value = formatted;
+            return parts.join('-');
         }
         
         /**
@@ -564,28 +557,36 @@
                 const data = await res.json();
                 
                 if (res.ok && data.keys && data.keys.length > 0) {
-                    // ИСПРАВЛЕНИЕ: Экранирование данных для предотвращения XSS
+                    // Карточка ключа: ключ одной строкой, кнопка копировать, статус, скрытый device_id
                     list.innerHTML = data.keys.map(k => {
                         const status = (k.status || '').toLowerCase();
                         const hasDevice = k.device_id && k.device_id !== '';
                         const isBound = status === 'активен' || status === 'active' || hasDevice;
                         const statusText = isBound ? 'Активен' : 'Свободен';
                         const statusColor = isBound ? 'text-green-400' : 'text-yellow-400';
-                        // Показываем устройство как есть: "ANDROID-5BB134BA"
-                        let deviceDisplay = '';
-                        if (hasDevice) {
-                            deviceDisplay = `<div class="text-xs text-slate-500 mt-1">Устройство: <span class="text-slate-400 font-mono">${escapeHtml(k.device_id)}</span></div>`;
-                        }
+                        const statusBg = isBound ? 'bg-green-500/10 border-green-500/30' : 'bg-yellow-500/10 border-yellow-500/30';
+                        const purchaseDate = k.purchase_date ? new Date(k.purchase_date).toLocaleDateString('ru-RU') : '';
+                        
                         return `
                         <div class="key-card rounded-xl p-4">
-                            <div class="flex items-center justify-between mb-2 gap-2">
+                            <!-- Ключ и кнопка копировать -->
+                            <div class="flex items-center justify-between gap-2 mb-3">
                                 <code class="text-blue-400 font-bold text-base tracking-wider whitespace-nowrap flex-1 min-w-0 overflow-x-auto">${escapeHtml(k.key)}</code>
-                                <button onclick="navigator.clipboard.writeText('${escapeHtml(k.key)}'); showSuccess('Ключ скопирован!')" class="shrink-0 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors" title="Копировать ключ">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                <button onclick="copyKey('${escapeHtml(k.key)}')" class="shrink-0 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                    Копировать
                                 </button>
                             </div>
-                            <div class="text-xs ${statusColor} font-medium">${escapeHtml(statusText)}</div>
-                            ${deviceDisplay}
+                            
+                            <!-- Статус -->
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusBg} ${statusColor} border">
+                                    ${escapeHtml(statusText)}
+                                </span>
+                            </div>
+                            
+                            <!-- Скрытый device_id (для внутреннего использования) -->
+                            <div class="hidden" data-device-id="${escapeHtml(k.device_id || '')}"></div>
                         </div>
                     `;}).join('');
                 } else if (res.ok && data.keys && data.keys.length === 0) {
@@ -603,6 +604,22 @@
                 list.innerHTML = '<p class="text-red-400 text-sm">Ошибка загрузки. Попробуйте позже.</p>';
                 console.error("Load keys error:", e);
             }
+        }
+
+        // ── Копирование ключа ───────────────────────────────────────
+        function copyKey(key) {
+            navigator.clipboard.writeText(key).then(() => {
+                showSuccess("Ключ скопирован!");
+            }).catch(() => {
+                // Fallback для старых браузеров
+                const textarea = document.createElement('textarea');
+                textarea.value = key;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showSuccess("Ключ скопирован!");
+            });
         }
 
         // ── Отправка ключей на email ───────────────────────────────
