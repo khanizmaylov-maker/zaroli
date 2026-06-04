@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>Zaroli — Пожизненный доступ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -452,9 +449,7 @@
             list.innerHTML = '<p class="text-slate-500 text-sm">Загрузка…</p>';
 
             try {
-                // Добавляем timestamp для предотвращения кэширования
-                const timestamp = Date.now();
-                const res = await fetch(API_GATEWAY_URL + "/get-keys?_=" + timestamp, {
+                const res = await fetch(API_GATEWAY_URL + "/get-keys", {
                     method: "POST",
                     headers: {"Content-Type": "application/json"},
                     body: JSON.stringify({token: appState.token})
@@ -507,16 +502,12 @@
             }
 
             try {
-                const res = await fetch(API_GATEWAY_URL + "/restore-keys", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({token: appState.token})
-                });
+                const res = await fetch(API_GATEWAY_URL + "/create-payment?email=" + encodeURIComponent(appState.email), {method: "GET"});
                 const data = await res.json();
-                if (res.ok) {
-                    alert(data.message || "Ключи отправлены на email. Проверьте почту (и папку Спам).");
+                if (data.count > 0) {
+                    alert(`Отправлено ${data.count} ключей на ${appState.email}. Проверьте почту (и папку Спам).`);
                 } else {
-                    alert("Ошибка: " + (data.error || "Не удалось отправить ключи"));
+                    alert("Ключи не найдены для этого email.");
                 }
             } catch(e) {
                 alert("Ошибка: " + e.message);
