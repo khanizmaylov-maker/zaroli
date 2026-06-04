@@ -261,6 +261,11 @@
         };
 
         function navigateTo(viewName) {
+            // Если пользователь авторизован и пытается перейти на страницу авторизации - перенаправляем на ключи
+            if (viewName === 'auth' && appState.token) {
+                viewName = 'keys';
+            }
+            
             document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
             const view = document.getElementById(`view-${viewName}`);
             if (view) view.classList.remove('hidden');
@@ -268,6 +273,18 @@
             const activeBtn = document.querySelector(`[data-target="${viewName}"]`);
             if (activeBtn) activeBtn.classList.add('active');
             document.getElementById('content-area').scrollTop = 0;
+            
+            // Показываем/скрываем кнопку "Выйти" в зависимости от авторизации
+            if (appState.token) {
+                document.getElementById("logout-btn").classList.remove("hidden");
+            } else {
+                document.getElementById("logout-btn").classList.add("hidden");
+            }
+            
+            // Если переходим на страницу ключей - загружаем их
+            if (viewName === 'keys' && appState.token) {
+                loadKeys();
+            }
         }
 
         function logout() {
