@@ -23,7 +23,6 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .key-card { background: rgba(15, 23, 42, 0.8); border: 1px dashed #475569; }
         .code-input { letter-spacing: 0.5em; font-size: 1.5em; text-align: center; }
-        /* Спиннер загрузки */
         .spinner {
             border: 3px solid rgba(255,255,255,0.3);
             border-radius: 50%;
@@ -36,6 +35,20 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        /* Стили для уведомлений */
+        .toast-notification {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
     </style>
 </head>
@@ -65,11 +78,11 @@
                 </div>
                 <div class="space-y-3">
                     <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <svg class="w-5 h-5 text-green-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         <span class="text-sm text-slate-300">Доступ ко всем функциям</span>
                     </div>
                     <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <svg class="w-5 h-5 text-green-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         <span class="text-sm text-slate-300">Ключ приходит на email</span>
                     </div>
                 </div>
@@ -95,12 +108,12 @@
                 <div class="space-y-4 pt-4">
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Email адрес</label>
-                        <input type="email" id="auth-email" placeholder="name@example.com" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" required>
+                        <input type="email" id="auth-email" placeholder="name@example.com" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <button onclick="requestCode()" id="request-code-btn" class="btn-primary w-full py-3.5 rounded-xl font-semibold text-white shadow-lg">Отправить код</button>
                 </div>
                 <div class="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 text-xs text-blue-200">
-                    🔒 Для безопасности мы отправим код подтверждения на ваш email. Ключи будут показаны только после введения кода.
+                    🔒 Для безопасности мы отправим код подтверждения на ваш email. Ключи будут показаны только после ввода кода.
                 </div>
             </div>
 
@@ -120,7 +133,7 @@
                 <div class="space-y-4 pt-4">
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Код подтверждения (6 цифр)</label>
-                        <input type="text" id="verify-code-input" inputmode="numeric" maxlength="6" placeholder="______" class="code-input w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" required>
+                        <input type="text" id="verify-code-input" inputmode="numeric" maxlength="6" placeholder="______" class="code-input w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <button onclick="verifyCode()" id="verify-code-btn" class="btn-primary w-full py-3.5 rounded-xl font-semibold text-white shadow-lg">Подтвердить</button>
                     <div class="text-center">
@@ -156,7 +169,7 @@
                 </div>
             </div>
 
-            <!-- TRANSFER -->
+            <!-- TRANSFER - ИСПРАВЛЕНА ВЕРСИЯ -->
             <div id="view-transfer" class="hidden space-y-6 fade-in">
                 <div class="flex items-center gap-2 mb-4 cursor-pointer text-slate-400 hover:text-white transition-colors" onclick="navigateTo('keys')">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
@@ -166,11 +179,15 @@
                     <h2 class="text-xl font-bold text-white">Отвязка ключа</h2>
                     <p class="text-sm text-slate-400 mt-1">Введите ключ для отвязки от устройства</p>
                 </div>
-                <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 text-xs text-yellow-200">Внимание: После отвязки ключ перестанет работать на этом устройстве.</div>
+                <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 text-xs text-yellow-200">⚠️ Внимание: После отвязки ключ перестанет работать на текущем устройстве.</div>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Ключ (ZRL-XXXX-XXXX-XXXX)</label>
-                        <input type="text" id="transfer-key-input" placeholder="ZRL-XXXX-XXXX-XXXX" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors uppercase" maxlength="19" required>
+                        <!-- ИСПРАВЛЕНИЕ: Увеличил maxlength до 23, чтобы можно было ввести ключ с дефисами -->
+                        <input type="text" id="transfer-key-input" placeholder="ZRL-XXXX-XXXX-XXXX" 
+                               class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 font-mono text-sm tracking-wider"
+                               maxlength="23">
+                        <p class="text-xs text-slate-500 mt-1">Формат: ZRL-XXXX-XXXX-XXXX (буквы и цифры)</p>
                     </div>
                     <button onclick="performDetach()" class="btn-danger w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -192,7 +209,7 @@
                 <div class="space-y-4 pt-4">
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Email адрес</label>
-                        <input type="email" id="buy-email" placeholder="name@example.com" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors" required>
+                        <input type="email" id="buy-email" placeholder="name@example.com" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <button id="buy-button" class="btn-primary w-full py-3.5 rounded-xl font-semibold text-white shadow-lg">Перейти к оплате — 99 ₽</button>
                     <p class="text-xs text-center text-slate-500 mt-2">Ключ придёт на email после оплаты.</p>
@@ -225,7 +242,7 @@
                     </details>
                     <details class="bg-slate-800/50 rounded-xl p-4 cursor-pointer">
                         <summary class="font-medium text-slate-200 text-sm">Безопасность</summary>
-                        <p class="text-slate-400 text-sm mt-2">Для защиты ваших ключей мы используем подтверждение через email. Только владелец почты может управлять ключами.</p>
+                        <p class="text-slate-400 text-sm mt-2">Для защиты ваших ключей мы используем подтверждение через email. Только владелец email может управлять ключами.</p>
                     </details>
                     <details class="bg-slate-800/50 rounded-xl p-4 cursor-pointer">
                         <summary class="font-medium text-slate-200 text-sm">Связаться с поддержкой</summary>
@@ -240,15 +257,15 @@
         <nav class="bg-slate-900 border-t border-white/10 p-2 z-10 shrink-0">
             <div class="grid grid-cols-5 gap-1">
                 <button onclick="navigateTo('home')" class="nav-btn active flex flex-col items-center justify-center p-2 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-white/5 transition-all" data-target="home">
-                    <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v9a1 1 0 001 1h3v-3a1 1 0 011-1h2a1 1 0 011 1v3h3a1 1 0 001-1v-9"></path></svg>
+                    <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v9a1 1 0 001 1h12a1 1 0 001-1v-9"></path></svg>
                     <span class="text-[9px]">Главная</span>
                 </button>
                 <button onclick="navigateTo('buy')" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-white/5 transition-all" data-target="buy">
-                    <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-9a2 2 0 012-2z"></path></svg>
+                    <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7a2 2 0 012-2z"></path></svg>
                     <span class="text-[9px]">Купить</span>
                 </button>
                 <button onclick="navigateTo('auth')" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-white/5 transition-all" data-target="auth">
-                    <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.65 10H17a1 1 0 010 2h-4.35l1.08 1.08a1 1 0 11-1.41 1.41l-2.5-2.5a1 1 0 010-1.41l2.5-2.5a1 1 0 111.41 1.41L12.65 10zM7 13H2.65l1.08 1.08a1 1 0 11-1.41 1.41l-2.5-2.5a1 1 0 010-1.41l2.5-2.5a1 1 0 111.41 1.41L2.65 12H7a1 1 0 010 2z"></path></svg>
+                    <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.65 10A5.99 5.99 0 007 6c-3.31 0-6 2.69-6 6s2.69 6 6 6a5.99 5.99 0 005.65-4H17v4h4v-4h2v-4H12.65zM7 14a2 2 0 110-4 2 2 0 010 4z"></path></svg>
                     <span class="text-[9px]">Ключи</span>
                 </button>
                 <button onclick="navigateTo('transfer')" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-white/5 transition-all" data-target="transfer">
@@ -256,12 +273,15 @@
                     <span class="text-[9px]">Отвязать</span>
                 </button>
                 <button onclick="navigateTo('help')" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-white/5 transition-all" data-target="help">
-                    <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.546-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <span class="text-[9px]">Помощь</span>
                 </button>
             </div>
         </nav>
     </main>
+
+    <!-- Контейнер для уведомлений -->
+    <div id="toast-container" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none"></div>
 
     <script>
         // ── Конфигурация ──────────────────────────────────────────
@@ -269,11 +289,6 @@
         
         // ── Вспомогательные функции ───────────────────────────────
         
-        /**
-         * Экранирование HTML для предотвращения XSS
-         * @param {string} text - Текст для экранирования
-         * @returns {string} - Экранированный текст
-         */
         function escapeHtml(text) {
             if (text === null || text === undefined) return '';
             const div = document.createElement('div');
@@ -281,71 +296,70 @@
             return div.innerHTML;
         }
         
-        /**
-         * Валидация формата email
-         * @param {string} email - Email для проверки
-         * @returns {boolean} - Результат валидации
-         */
         function isValidEmail(email) {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
         
-        /**
-         * Валидация формата ключа
-         * @param {string} key - Ключ для проверки
-         * @returns {boolean} - Результат валидации
-         */
         function isValidKeyFormat(key) {
-            return /^ZRL-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key);
+            // Поддерживаем оба формата: с дефисами и без
+            const withoutDashes = key.replace(/-/g, '');
+            return /^ZRL[A-Z0-9]{12}$/.test(withoutDashes);
         }
         
-        /**
-         * Форматирование ключа при вводе (авто-добавление дефисов)
-         * @param {string} value - Введённое значение
-         * @returns {string} - Отформатированный ключ
-         */
+        function normalizeKey(key) {
+            // Приводим ключ к стандартному формату ZRL-XXXX-XXXX-XXXX
+            const cleaned = key.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (cleaned.length >= 4 && cleaned.startsWith('ZRL')) {
+                const parts = [];
+                for (let i = 0; i < cleaned.length && i < 12; i += 4) {
+                    parts.push(cleaned.substring(i, i + 4));
+                }
+                return parts.join('-');
+            }
+            return key.toUpperCase();
+        }
+        
         function formatKeyInput(value) {
-            const cleaned = value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
-            const parts = [];
-            for (let i = 0; i < cleaned.length && i < 12; i += 4) {
-                parts.push(cleaned.substring(i, i + 4));
+            const cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (cleaned.length === 0) return '';
+            
+            let result = '';
+            for (let i = 0; i < cleaned.length && i < 16; i++) {
+                if (i === 3 || i === 7 || i === 11) {
+                    result += '-';
+                }
+                result += cleaned[i];
             }
-            return parts.join('-');
+            return result;
         }
         
-        /**
-         * Показать сообщение об ошибке пользователю
-         * @param {string} message - Сообщение об ошибке
-         */
-        function showError(message) {
-            // Используем более дружелюбное уведомление вместо alert
-            const errorContainer = document.getElementById('global-error');
-            if (errorContainer) {
-                errorContainer.textContent = message;
-                errorContainer.classList.remove('hidden');
-                setTimeout(() => errorContainer.classList.add('hidden'), 5000);
-            } else {
-                alert(message);
-            }
+        function showToast(message, isError = false) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-3 rounded-xl shadow-lg text-sm font-medium backdrop-blur-md transition-all duration-300 pointer-events-auto ${
+                isError 
+                    ? 'bg-red-500/90 text-white border border-red-400' 
+                    : 'bg-green-500/90 text-white border border-green-400'
+            }`;
+            toast.textContent = message;
+            container.innerHTML = '';
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    if (container.firstChild === toast) {
+                        container.innerHTML = '';
+                    }
+                }, 300);
+            }, 4000);
         }
         
-        /**
-         * Показать успешное сообщение
-         * @param {string} message - Сообщение об успехе
-         */
-        function showSuccess(message) {
-            const successContainer = document.getElementById('global-success');
-            if (successContainer) {
-                successContainer.textContent = message;
-                successContainer.classList.remove('hidden');
-                setTimeout(() => successContainer.classList.add('hidden'), 5000);
-            } else {
-                alert(message);
-            }
-        }
+        function showError(message) { showToast(message, true); }
+        function showSuccess(message) { showToast(message, false); }
 
         // ── Состояние приложения ─────────────────────────────────
-        // ИСПРАВЛЕНИЕ: Используем sessionStorage вместо localStorage для безопасности
         let appState = {
             email: sessionStorage.getItem("userEmail") || "",
             token: sessionStorage.getItem("userToken") || "",
@@ -354,7 +368,6 @@
         };
 
         function navigateTo(viewName) {
-            // Если пользователь авторизован и пытается перейти на страницу авторизации - перенаправляем на ключи
             if (viewName === 'auth' && appState.token) {
                 viewName = 'keys';
             }
@@ -367,14 +380,13 @@
             if (activeBtn) activeBtn.classList.add('active');
             document.getElementById('content-area').scrollTop = 0;
             
-            // Показываем/скрываем кнопку "Выйти" в зависимости от авторизации
+            const logoutBtn = document.getElementById("logout-btn");
             if (appState.token) {
-                document.getElementById("logout-btn").classList.remove("hidden");
+                logoutBtn.classList.remove("hidden");
             } else {
-                document.getElementById("logout-btn").classList.add("hidden");
+                logoutBtn.classList.add("hidden");
             }
             
-            // Если переходим на страницу ключей - загружаем их
             if (viewName === 'keys' && appState.token) {
                 loadKeys();
             }
@@ -383,26 +395,21 @@
         function logout() {
             appState.email = "";
             appState.token = "";
-            // ИСПРАВЛЕНИЕ: sessionStorage вместо localStorage
             sessionStorage.removeItem("userEmail");
             sessionStorage.removeItem("userToken");
             document.getElementById("logout-btn").classList.add("hidden");
             
-            // Очищаем таймер
             if (appState.resendTimer) {
                 clearInterval(appState.resendTimer);
                 appState.resendTimer = null;
             }
-            
             navigateTo("home");
         }
 
-        // ── Шаг 1: Запрос кода ─────────────────────────────────────
         async function requestCode() {
             const emailInput = document.getElementById("auth-email");
             const email = emailInput.value.trim().toLowerCase();
             
-            // ИСПРАВЛЕНИЕ: Улучшенная валидация email
             if (!email || !isValidEmail(email)) {
                 showError("Введите корректный email");
                 return;
@@ -422,7 +429,6 @@
                 const data = await res.json();
                 
                 if (res.ok) {
-                    // ИСПРАВЛЕНИЕ: sessionStorage вместо localStorage
                     appState.email = email;
                     sessionStorage.setItem("userEmail", email);
                     
@@ -436,8 +442,7 @@
                     showError("Ошибка: " + (data.error || "Неизвестная ошибка"));
                 }
             } catch(e) {
-                // ИСПРАВЛЕНИЕ: Более понятное сообщение об ошибке
-                showError("Не удалось подключиться к серверу. Проверьте подключение к интернету.");
+                showError("Не удалось подключиться к серверу. Проверьте подключение.");
                 console.error("Network error:", e);
             } finally {
                 btn.disabled = false;
@@ -445,7 +450,6 @@
             }
         }
 
-        // ── Шаг 2: Верификация кода ────────────────────────────────
         async function verifyCode() {
             const codeInput = document.getElementById("verify-code-input");
             const code = codeInput.value.trim();
@@ -462,320 +466,4 @@
             try {
                 const res = await fetch(API_GATEWAY_URL + "/verify-code", {
                     method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        email: appState.email,
-                        code: code
-                    })
-                });
-                
-                const data = await res.json();
-                
-                if (res.ok && data.token) {
-                    // ИСПРАВЛЕНИЕ: sessionStorage вместо localStorage
-                    appState.token = data.token;
-                    sessionStorage.setItem("userToken", data.token);
-                    
-                    // Очищаем таймер
-                    if (appState.resendTimer) {
-                        clearInterval(appState.resendTimer);
-                        appState.resendTimer = null;
-                    }
-                    
-                    // Показываем ключи
-                    document.getElementById("logout-btn").classList.remove("hidden");
-                    navigateTo("keys");
-                    await loadKeys();
-                } else {
-                    showVerifyError(data.error || "Неверный код");
-                    codeInput.value = "";
-                    codeInput.focus();
-                }
-            } catch(e) {
-                showVerifyError("Не удалось подключиться к серверу. Проверьте подключение к интернету.");
-                console.error("Network error:", e);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = "Подтвердить";
-            }
-        }
-
-        function showVerifyError(message) {
-            const errorEl = document.getElementById("verify-error");
-            errorEl.textContent = message;
-            errorEl.classList.remove("hidden");
-        }
-
-        // ── Таймер повторной отправки ──────────────────────────────
-        function startResendTimer() {
-            const btn = document.getElementById("resend-code-btn");
-            const timerEl = document.getElementById("timer-seconds");
-            const timerContainer = document.getElementById("resend-timer");
-            
-            btn.disabled = true;
-            timerContainer.classList.remove("hidden");
-            
-            let remaining = appState.resendCooldown;
-            timerEl.textContent = remaining;
-            
-            if (appState.resendTimer) {
-                clearInterval(appState.resendTimer);
-            }
-            
-            appState.resendTimer = setInterval(() => {
-                remaining--;
-                timerEl.textContent = remaining;
-                
-                if (remaining <= 0) {
-                    clearInterval(appState.resendTimer);
-                    appState.resendTimer = null;
-                    btn.disabled = false;
-                    timerContainer.classList.add("hidden");
-                }
-            }, 1000);
-        }
-
-        // ── Шаг 3: Загрузка ключей ─────────────────────────────────
-        async function loadKeys() {
-            if (!appState.token) {
-                navigateTo("auth");
-                return;
-            }
-
-            document.getElementById("user-email-display").textContent = appState.email;
-            const list = document.getElementById("keys-list");
-            // ИСПРАВЛЕНИЕ: Спиннер загрузки вместо текста
-            list.innerHTML = '<div class="spinner"></div>';
-
-            try {
-                const res = await fetch(API_GATEWAY_URL + "/get-keys", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({token: appState.token})
-                });
-                
-                const data = await res.json();
-                
-                if (res.ok && data.keys && data.keys.length > 0) {
-                    // Карточка ключа: ключ одной строкой, кнопка копировать, статус, скрытый device_id
-                    list.innerHTML = data.keys.map(k => {
-                        const status = (k.status || '').toLowerCase();
-                        const hasDevice = k.device_id && k.device_id !== '';
-                        const isBound = status === 'активен' || status === 'active' || hasDevice;
-                        const statusText = isBound ? 'Активен' : 'Свободен';
-                        const statusColor = isBound ? 'text-green-400' : 'text-yellow-400';
-                        const statusBg = isBound ? 'bg-green-500/10 border-green-500/30' : 'bg-yellow-500/10 border-yellow-500/30';
-                        const purchaseDate = k.purchase_date ? new Date(k.purchase_date).toLocaleDateString('ru-RU') : '';
-                        
-                        return `
-                        <div class="key-card rounded-xl p-4">
-                            <!-- Ключ и кнопка копировать -->
-                            <div class="flex items-center justify-between gap-2 mb-3">
-                                <code class="text-blue-400 font-bold text-base tracking-wider whitespace-nowrap flex-1 min-w-0">${escapeHtml(k.key)}</code>
-                                <button onclick="copyKey('${escapeHtml(k.key)}')" class="shrink-0 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 w-8 h-8 rounded-lg transition-colors flex items-center justify-center" title="Скопировать">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                                </button>
-                            </div>
-                            
-                            <!-- Статус -->
-                            <div class="flex items-center gap-2">
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusBg} ${statusColor} border">
-                                    ${escapeHtml(statusText)}
-                                </span>
-                            </div>
-                            
-                            <!-- Скрытый device_id (для внутреннего использования) -->
-                            <div class="hidden" data-device-id="${escapeHtml(k.device_id || '')}"></div>
-                        </div>
-                    `;}).join('');
-                } else if (res.ok && data.keys && data.keys.length === 0) {
-                    list.innerHTML = '<p class="text-slate-500 text-sm">Ключи не найдены. Купите первый ключ!</p>';
-                } else {
-                    // Токен недействителен
-                    if (res.status === 401) {
-                        logout();
-                        showError("Сессия истекла. Пожалуйста, войдите снова.");
-                    } else {
-                        list.innerHTML = '<p class="text-red-400 text-sm">Ошибка: ' + escapeHtml(data.error || 'Неизвестная') + '</p>';
-                    }
-                }
-            } catch(e) {
-                list.innerHTML = '<p class="text-red-400 text-sm">Ошибка загрузки. Попробуйте позже.</p>';
-                console.error("Load keys error:", e);
-            }
-        }
-
-        // ── Копирование ключа ───────────────────────────────────────
-        function copyKey(key) {
-            navigator.clipboard.writeText(key).then(() => {
-                showSuccess("Ключ скопирован!");
-            }).catch(() => {
-                // Fallback для старых браузеров
-                const textarea = document.createElement('textarea');
-                textarea.value = key;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                showSuccess("Ключ скопирован!");
-            });
-        }
-
-        // ── Отправка ключей на email ───────────────────────────────
-        // ИСПРАВЛЕНИЕ: Используем POST с токеном вместо GET с email
-        async function restoreKeys() {
-            if (!appState.token) {
-                showError("Необходима авторизация");
-                return;
-            }
-
-            const btn = document.querySelector('button[onclick="restoreKeys()"]');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div>';
-
-            try {
-                // ИСПРАВЛЕНИЕ: POST запрос с токеном вместо GET с email в query string
-                const res = await fetch(API_GATEWAY_URL + "/restore-keys", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({token: appState.token})
-                });
-                const data = await res.json();
-                if (data.count > 0) {
-                    showSuccess(`Отправлено ${data.count} ключей на ${appState.email}. Проверьте почту (и папку Спам).`);
-                } else {
-                    showError("Ключи не найдены для этого email.");
-                }
-            } catch(e) {
-                showError("Не удалось отправить ключи. Попробуйте позже.");
-                console.error("Restore keys error:", e);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
-        }
-
-        // ── Отвязка ключа ──────────────────────────────────────────
-        async function performDetach() {
-            const keyInput = document.getElementById("transfer-key-input");
-            const key = keyInput.value.trim().toUpperCase();
-            
-            // ИСПРАВЛЕНИЕ: Валидация формата ключа
-            if (!key) {
-                showError("Введите ключ");
-                return;
-            }
-            
-            if (!isValidKeyFormat(key)) {
-                showError("Некорректный формат ключа. Ожидается: ZRL-XXXX-XXXX-XXXX");
-                return;
-            }
-            
-            if (!appState.token) {
-                showError("Необходима авторизация");
-                navigateTo("auth");
-                return;
-            }
-
-            if (!confirm("Вы уверены? Ключ перестанет работать на текущем устройстве.")) {
-                return;
-            }
-
-            const btn = document.querySelector('button[onclick="performDetach()"]');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div>';
-
-            try {
-                const res = await fetch(API_GATEWAY_URL + "/manage-key", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        token: appState.token,
-                        key: key,
-                        action: "detach"
-                    })
-                });
-                
-                const data = await res.json();
-                
-                if (res.ok) {
-                    showSuccess(data.message || "Ключ успешно отвязан");
-                    keyInput.value = "";
-                    
-                    // Обновляем список ключей если мы на странице ключей
-                    if (!document.getElementById("view-keys").classList.contains("hidden")) {
-                        await loadKeys();
-                    }
-                } else {
-                    showError("Ошибка: " + (data.error || "Неизвестная ошибка"));
-                }
-            } catch(e) {
-                showError("Не удалось отвязать ключ. Попробуйте позже.");
-                console.error("Detach error:", e);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
-        }
-
-        // ── Инициализация ──────────────────────────────────────────
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById("buy-button")?.addEventListener("click", goPayment);
-            
-            // ИСПРАВЛЕНИЕ: Автоформатирование ввода ключа
-            const keyInput = document.getElementById("transfer-key-input");
-            keyInput?.addEventListener("input", function(e) {
-                const cursorPosition = this.selectionStart;
-                const oldValue = this.value;
-                const newValue = formatKeyInput(oldValue);
-                this.value = newValue;
-                
-                // Корректировка позиции курсора
-                const diff = newValue.length - oldValue.length;
-                this.setSelectionRange(cursorPosition + diff, cursorPosition + diff);
-            });
-            
-            // Восстанавливаем сессию если есть токен
-            if (appState.token && appState.email) {
-                document.getElementById("logout-btn").classList.remove("hidden");
-                document.getElementById("user-email-display").textContent = appState.email;
-            }
-        });
-
-        // ── Оплата ─────────────────────────────────────────────────
-        async function goPayment() {
-            const email = document.getElementById("buy-email").value.trim();
-            // ИСПРАВЛЕНИЕ: Улучшенная валидация email
-            if (!email || !isValidEmail(email)) {
-                showError("Введите корректный email");
-                return;
-            }
-            const btn = document.getElementById("buy-button");
-            btn.disabled = true;
-            btn.textContent = "Создание…";
-            try {
-                const res = await fetch(API_GATEWAY_URL + "/create-payment", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({email})
-                });
-                const data = await res.json();
-                if (data.confirmation_url) {
-                    window.location.href = data.confirmation_url;
-                } else {
-                    showError("Ошибка: " + (data.error || "Неизвестная"));
-                    btn.disabled = false;
-                    btn.textContent = "Перейти к оплате — 99 ₽";
-                }
-            } catch(e) {
-                showError("Не удалось создать платёж. Попробуйте позже.");
-                console.error("Payment error:", e);
-                btn.disabled = false;
-                btn.textContent = "Перейти к оплате — 99 ₽";
-            }
-        }
-    </script>
-</body>
-</html>
+                    headers
