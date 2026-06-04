@@ -564,13 +564,10 @@
                         const isBound = status === 'активен' || status === 'active' || hasDevice;
                         const statusText = isBound ? 'Активен' : 'Свободен';
                         const statusColor = isBound ? 'text-green-400' : 'text-yellow-400';
-                        // Форматируем устройство: "ANDROID-XXXX" -> "ANDROID - Realme10"
+                        // Показываем устройство как есть: "ANDROID-5BB134BA"
                         let deviceDisplay = '';
                         if (hasDevice) {
-                            const deviceId = k.device_id;
-                            // Убираем префикс ANDROID- и показываем читаемо
-                            const deviceName = deviceId.replace(/^ANDROID-?/i, '').replace(/^[0-9A-F]+$/, 'Устройство');
-                            deviceDisplay = `<div class="text-xs text-slate-500 mt-1">Устройство: <span class="text-slate-400">ANDROID - ${escapeHtml(deviceName)}</span></div>`;
+                            deviceDisplay = `<div class="text-xs text-slate-500 mt-1">Устройство: <span class="text-slate-400 font-mono">${escapeHtml(k.device_id)}</span></div>`;
                         }
                         return `
                         <div class="key-card rounded-xl p-4">
