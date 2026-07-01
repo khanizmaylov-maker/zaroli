@@ -1,759 +1,1092 @@
 <!DOCTYPE html>
 <html lang="ru">
-<link rel="icon" type="image/png" href="favicon.png">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zaroli — Пожизненный доступ</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Cormorant+Garamond:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #e2e8f0; }
-        .app-container { height: 90vh; max-height: 850px; }
-        @media (max-width: 640px) { .app-container { height: 100vh; border-radius: 0; } }
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .btn-primary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); transition: all 0.3s ease; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.5); }
-        .btn-secondary { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.2s ease; }
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
-        .btn-danger { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; }
-        .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
-        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .key-card { background: rgba(15, 23, 42, 0.8); border: 1px dashed #475569; }
-        .code-input { letter-spacing: 0.5em; font-size: 1.5em; text-align: center; }
-        /* Спиннер загрузки */
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top: 3px solid #3b82f6;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #F4E4BC;
+            --gold-dark: #8B6914;
+            --gold-accent: #C9A84C;
+            --dark-bg: #0a0a0a;
+            --dark-card: rgba(15, 13, 10, 0.92);
+            --dark-border: rgba(212, 175, 55, 0.25);
+            --text-light: #f5f0e8;
+            --text-muted: #a89f91;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Rich Background */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 15% 50%, rgba(139, 105, 20, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 85% 25%, rgba(139, 105, 20, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 85%, rgba(100, 80, 20, 0.1) 0%, transparent 60%),
+                radial-gradient(ellipse at 30% 15%, rgba(212, 175, 55, 0.04) 0%, transparent 50%),
+                url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1920&q=80') center/cover no-repeat;
+            z-index: -2;
+        }
+
+        .bg-dark {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(180deg, rgba(5, 5, 5, 0.92) 0%, rgba(10, 10, 10, 0.88) 100%);
+            z-index: -1;
+        }
+
+        /* Decorative Elements */
+        .top-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--gold-dark) 20%, 
+                var(--gold) 50%, 
+                var(--gold-dark) 80%, 
+                transparent 100%);
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .corner-decoration {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            border: 2px solid var(--gold);
+            opacity: 0.15;
+            z-index: 1;
+        }
+
+        .corner-decoration.top-left {
+            top: 20px;
+            left: 20px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner-decoration.top-right {
+            top: 20px;
+            right: 20px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner-decoration.bottom-left {
+            bottom: 20px;
+            left: 20px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner-decoration.bottom-right {
+            bottom: 20px;
+            right: 20px;
+            border-left: none;
+            border-top: none;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 50px;
+            border-bottom: 1px solid var(--dark-border);
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(15px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+            transition: transform 0.3s ease;
+        }
+
+        .logo-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--gold);
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .logo-sub {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 14px;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            margin-top: 4px;
+            font-weight: 300;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .btn-logout {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 1px solid rgba(168, 159, 145, 0.3);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-logout:hover {
+            color: var(--gold);
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 70px 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Page Sections */
+        .page {
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 50px 0 70px;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 25px;
+            border: 1px solid var(--dark-border);
+            border-radius: 30px;
+            font-size: 12px;
+            color: var(--gold);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 35px;
+            background: rgba(212, 175, 55, 0.05);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+        }
+
+        .hero-badge::before {
+            content: '◆';
+            font-size: 8px;
+            color: var(--gold);
+        }
+
+        .hero-badge::after {
+            content: '◆';
+            font-size: 8px;
+            color: var(--gold);
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 64px;
+            font-weight: 900;
+            color: var(--gold);
+            margin-bottom: 20px;
+            letter-spacing: 4px;
+            text-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+            position: relative;
+        }
+
+        .hero-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .hero-subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            color: var(--text-muted);
+            font-weight: 300;
+            margin-bottom: 50px;
+            letter-spacing: 1px;
+        }
+
+        /* Decorative Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 50px 0;
+        }
+
+        .divider-line {
+            width: 100px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .divider-diamond {
+            width: 12px;
+            height: 12px;
+            background: var(--gold);
+            transform: rotate(45deg);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 16px;
+            padding: 50px;
+            margin-bottom: 35px;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(212, 175, 55, 0.1);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            color: var(--gold);
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+        }
+
+        .card-text {
+            font-size: 16px;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        /* Price Card */
+        .price-card {
+            text-align: center;
+            padding: 60px 50px;
+        }
+
+        .price-amount {
+            font-family: 'Playfair Display', serif;
+            font-size: 72px;
+            font-weight: 900;
+            color: var(--gold);
+            margin: 25px 0 10px;
+            text-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+            position: relative;
+            display: inline-block;
+        }
+
+        .price-amount::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .price-currency {
+            font-size: 28px;
+            color: var(--gold-light);
+            margin-left: 5px;
+        }
+
+        .price-label {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        /* Features */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px 25px;
+            border: 1px solid var(--dark-border);
+            border-radius: 10px;
+            background: rgba(212, 175, 55, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+            background: rgba(212, 175, 55, 0.06);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .feature-text {
+            font-size: 15px;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            display: inline-block;
+            padding: 18px 45px;
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            color: #0a0a0a;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-secondary {
+            display: inline-block;
+            padding: 14px 28px;
+            background: transparent;
+            color: var(--gold);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            color: var(--text-muted);
+            font-size: 14px;
+            text-decoration: none;
+            border: 1px solid rgba(168, 159, 145, 0.2);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin-top: 25px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-back:hover {
+            color: var(--gold);
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--dark-border);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-input::placeholder {
+            color: rgba(168, 159, 145, 0.5);
+        }
+
+        /* Security Notice */
+        .security-notice {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 20px 25px;
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 10px;
+            margin: 25px 0;
+        }
+
+        .security-notice-icon {
+            font-size: 22px;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .security-notice-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* Keys List */
+        .key-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border: 1px solid var(--dark-border);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background: rgba(212, 175, 55, 0.02);
+            transition: all 0.3s ease;
+        }
+
+        .key-item:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+            background: rgba(212, 175, 55, 0.05);
+            transform: translateX(5px);
+        }
+
+        .key-code {
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            color: var(--gold-light);
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+        }
+
+        .key-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+            border-radius: 6px;
+            border: 1px solid var(--dark-border);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-small:hover {
+            color: var(--gold);
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Help Section */
+        .help-item {
+            margin-bottom: 35px;
+            padding-bottom: 35px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        .help-item:last-child {
+            border-bottom: none;
+        }
+
+        .help-question {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            color: var(--gold);
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .help-answer {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .help-answer a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .help-answer a:hover {
+            text-decoration: underline;
+            text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Navigation */
+        .nav-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid var(--dark-border);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            z-index: 50;
+            box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-link {
+            padding: 10px 20px;
+            font-size: 14px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--gold);
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Warning */
+        .warning-box {
+            padding: 20px 25px;
+            background: rgba(220, 50, 50, 0.08);
+            border: 1px solid rgba(220, 50, 50, 0.25);
+            border-radius: 10px;
+            margin: 25px 0;
+        }
+
+        .warning-text {
+            font-size: 14px;
+            color: #e8a0a0;
+            line-height: 1.7;
+        }
+
+        /* Timer */
+        .timer-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .resend-link {
+            color: var(--gold);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .resend-link:hover {
+            text-decoration: underline;
+            text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 20px 25px;
+            }
+
+            .logo {
+                font-size: 24px;
+                letter-spacing: 4px;
+            }
+
+            .logo-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .hero-title {
+                font-size: 42px;
+                letter-spacing: 2px;
+            }
+
+            .hero-subtitle {
+                font-size: 20px;
+            }
+
+            .card {
+                padding: 30px 25px;
+            }
+
+            .price-card {
+                padding: 40px 30px;
+            }
+
+            .price-amount {
+                font-size: 56px;
+            }
+
+            .container {
+                padding: 50px 20px 90px;
+            }
+
+            .nav-bottom {
+                flex-wrap: wrap;
+                gap: 5px;
+                padding: 12px 15px;
+            }
+
+            .nav-link {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+
+            .corner-decoration {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold-dark);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gold);
+        }
+
+        /* Selection */
+        ::selection {
+            background: rgba(212, 175, 55, 0.3);
+            color: var(--text-light);
+        }
+
+        /* Floating particles effect */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-    <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+<body>
+    <div class="bg-overlay"></div>
+    <div class="bg-dark"></div>
+    <div class="top-decoration"></div>
     
-    <main class="app-container w-full max-w-md glass-panel rounded-2xl shadow-2xl overflow-hidden relative flex flex-col">
-        <header class="p-6 border-b border-white/10 flex items-center justify-between bg-slate-900/50 z-10 shrink-0">
-            <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('home')">
-                <img src="favicon.png" alt="Zaroli" class="w-8 h-8 rounded-lg object-cover">
-                <h1 class="font-bold text-xl tracking-tight">Zaroli</h1>
-            </div>
-            <button onclick="logout()" id="logout-btn" class="text-xs text-red-400 hover:text-red-300 hidden">Выйти</button>
-        </header>
+    <div class="corner-decoration top-left"></div>
+    <div class="corner-decoration top-right"></div>
+    <div class="corner-decoration bottom-left"></div>
+    <div class="corner-decoration bottom-right"></div>
 
-        <div id="content-area" class="flex-1 min-h-0 p-6 overflow-y-auto relative scroll-smooth">
-            
-            <!-- HOME -->
-            <div id="view-home" class="space-y-6 fade-in">
-                <div class="text-center space-y-2">
-                    <h2 class="text-2xl font-bold text-white">Пожизненный доступ</h2>
-                    <p class="text-sm text-slate-400">Купите ключ — пользуйтесь всегда.</p>
-                </div>
-                <div class="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 text-sm text-blue-200 leading-relaxed">
-                    Пожизненная лицензия — <strong>99 ₽</strong>. Один ключ на одну покупку. Можно покупать несколько ключей.
-                </div>
-                <div class="space-y-3">
-                    <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="text-sm text-slate-300">Доступ ко всем функциям</span>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="text-sm text-slate-300">Ключ приходит на email</span>
-                    </div>
-                </div>
-                <div class="pt-4 grid grid-cols-1 gap-3">
-                    <button onclick="navigateTo('buy')" class="btn-primary w-full py-3.5 rounded-xl font-semibold text-white shadow-lg flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        Купить ключ — 99 ₽
-                    </button>
-                    <button onclick="navigateTo('auth')" class="btn-secondary w-full py-3 rounded-xl font-medium text-slate-300">Мои ключи</button>
+    <header>
+        <div class="logo-container">
+            <img src="gerb.png" alt="Герб Zaroli" class="logo-icon floating">
+            <div>
+                <div class="logo">Zaroli</div>
+                <div class="logo-sub">Пожизненный доступ</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <a href="#" class="btn-logout">Выйти</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Главная страница -->
+        <div class="page active" id="page-home">
+            <div class="hero">
+                <div class="hero-badge">Пожизненная лицензия</div>
+                <h1 class="hero-title">Zaroli</h1>
+                <p class="hero-subtitle">Купите ключ — пользуйтесь всегда.</p>
+                
+                <div class="divider">
+                    <div class="divider-line"></div>
+                    <div class="divider-diamond"></div>
+                    <div class="divider-line"></div>
                 </div>
             </div>
 
-            <!-- AUTH (шаг 1: ввод email) -->
-            <div id="view-auth" class="hidden space-y-6 fade-in">
-                <div class="flex items-center gap-2 mb-4 cursor-pointer text-slate-400 hover:text-white transition-colors" onclick="navigateTo('home')">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                    <span class="text-sm">Назад</span>
-                </div>
-                <div class="text-center">
-                    <h2 class="text-xl font-bold text-white">Мои ключи</h2>
-                    <p class="text-sm text-slate-400 mt-1">Введите email для получения кода подтверждения</p>
-                </div>
-                <div class="space-y-4 pt-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Email адрес</label>
-                        <input type="email" id="auth-email" placeholder="name@example.com" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500">
+            <div class="card price-card">
+                <div class="card-text" style="margin-bottom: 15px; font-size: 18px;">Пожизненная лицензия</div>
+                <div class="price-amount">99 <span class="price-currency">₽</span></div>
+                <div class="price-label">Один ключ на одну покупку. Можно покупать несколько ключей.</div>
+                
+                <div class="features">
+                    <div class="feature-item">
+                        <span class="feature-icon"></span>
+                        <span class="feature-text">Доступ ко всем функциям</span>
                     </div>
-                    <button onclick="requestCode()" id="request-code-btn" class="btn-primary w-full py-3.5 rounded-xl font-semibold text-white shadow-lg">Отправить код</button>
-                </div>
-                <div class="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 text-xs text-blue-200">
-                    🔒 Для безопасности мы отправим код подтверждения на ваш email. Ключи будут показаны только после ввода кода.
-                </div>
-            </div>
-
-            <!-- VERIFY (шаг 2: ввод кода) -->
-            <div id="view-verify" class="hidden space-y-6 fade-in">
-                <div class="flex items-center gap-2 mb-4 cursor-pointer text-slate-400 hover:text-white transition-colors" onclick="navigateTo('auth')">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                    <span class="text-sm">Назад</span>
-                </div>
-                <div class="text-center">
-                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/20 flex items-center justify-center">
-                        <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    </div>
-                    <h2 class="text-xl font-bold text-white">Введите код</h2>
-                    <p class="text-sm text-slate-400 mt-1">Мы отправили код на <span id="verify-email-display" class="text-blue-400 font-mono"></span></p>
-                </div>
-                <div class="space-y-4 pt-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Код подтверждения (6 цифр)</label>
-                        <input type="text" id="verify-code-input" inputmode="numeric" maxlength="6" placeholder="______" class="code-input w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500">
-                    </div>
-                    <button onclick="verifyCode()" id="verify-code-btn" class="btn-primary w-full py-3.5 rounded-xl font-semibold text-white shadow-lg">Подтвердить</button>
-                    <div class="text-center">
-                        <button onclick="requestCode()" id="resend-code-btn" class="text-sm text-blue-400 hover:text-blue-300 disabled:text-slate-500 disabled:cursor-not-allowed">
-                            Отправить код повторно
-                        </button>
-                        <p id="resend-timer" class="text-xs text-slate-500 mt-1 hidden">Повторная отправка через <span id="timer-seconds">60</span> сек.</p>
+                    <div class="feature-item">
+                        <span class="feature-icon">📧</span>
+                        <span class="feature-text">Ключ приходит на email</span>
                     </div>
                 </div>
-                <div id="verify-error" class="hidden bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-xs text-red-300"></div>
+
+                <a href="#" class="btn-primary" onclick="showPage('page-buy')">Купить ключ — 99 ₽</a>
             </div>
 
-            <!-- KEYS -->
-            <div id="view-keys" class="hidden space-y-6 fade-in">
-                <div class="flex items-center gap-2 mb-4 cursor-pointer text-slate-400 hover:text-white transition-colors" onclick="navigateTo('home')">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                    <span class="text-sm">Назад</span>
-                </div>
-                <h2 class="text-xl font-bold text-white">Мои ключи</h2>
-                <div class="text-xs text-slate-400">Email: <span id="user-email-display" class="text-blue-400 font-mono"></span></div>
-                <div id="keys-list" class="space-y-3">
-                    <div class="spinner"></div>
-                </div>
-                <div class="pt-4 border-t border-white-5 space-y-3">
-                    <button onclick="navigateTo('transfer')" class="btn-secondary w-full py-3 rounded-xl font-medium text-slate-300 flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
-                        Отвязать ключ
-                    </button>
-                    <button onclick="restoreKeys()" class="btn-primary w-full py-3 rounded-xl font-semibold text-white shadow-lg flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></svg>
-                        Отправить ключи на email
-                    </button>
-                </div>
+            <div style="text-align: center; margin-top: 35px;">
+                <a href="#" class="btn-secondary" onclick="showPage('page-keys')">Мои ключи</a>
             </div>
-
-            <!-- TRANSFER -->
-            <div id="view-transfer" class="hidden space-y-6 fade-in">
-                <div class="flex items-center gap-2 mb-4 cursor-pointer text-slate-400 hover:text-white transition-colors" onclick="navigateTo('keys')">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                    <span class="text-sm">Назад</span>
-                </div>
-                <div class="text-center">
-                    <h2 class="text-xl font-bold text-white">Отвязка ключа</h2>
-                    <p class="text-sm text-slate-400 mt-1">Введите ключ для отвязки от устройства</p>
-                </div>
-                <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 text-xs text-yellow-200">Внимание: После отвязки ключ перестанет работать на текущем устройстве.</div>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Ключ (ZRL-XXXX-XXXX-XXXX)</label>
-                        <input type="text" id="transfer-key-input" placeholder="ZRL-XXXX-XXXX-XXXX" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500" maxlength="19">
-                    </div>
-                    <button onclick="performDetach()" class="btn-danger w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        Отвязать ключ
-                    </button>
-                </div>
-            </div>
-
-            <!-- BUY -->
-            <div id="view-buy" class="hidden space-y-6 fade-in">
-                <div class="flex items-center gap-2 mb-4 cursor-pointer text-slate-400 hover:text-white transition-colors" onclick="navigateTo('home')">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                    <span class="text-sm">Назад</span>
-                </div>
-                <div class="text-center">
-                    <h2 class="text-xl font-bold text-white mb-1">Оформление доступа</h2>
-                    <p class="text-sm text-slate-400">Введите email для получения ключа</p>
-                </div>
-                <div class="space-y-4 pt-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Email адрес</label>
-                        <input type="email" id="buy-email" placeholder="name@example.com" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500">
-                    </div>
-                    <button id="buy-button" class="btn-primary w-full py-3.5 rounded-xl font-semibold text-white shadow-lg">Перейти к оплате — 99 ₽</button>
-                    <p class="text-xs text-center text-slate-500 mt-2">Ключ придёт на email после оплаты.</p>
-                </div>
-            </div>
-
-            <!-- HELP -->
-            <div id="view-help" class="hidden space-y-6 fade-in">
-                <div class="flex items-center gap-2 mb-4 cursor-pointer text-slate-400 hover:text-white transition-colors" onclick="navigateTo('home')">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                    <span class="text-sm">Назад</span>
-                </div>
-                <h2 class="text-xl font-bold text-white">Помощь</h2>
-                <div class="space-y-3">
-                    <details class="bg-slate-800/50 rounded-xl p-4 cursor-pointer">
-                        <summary class="font-medium text-slate-200 text-sm">О разработке Zaroli</summary>
-                        <p class="text-slate-400 text-sm mt-2">Zaroli создаётся вручную, без инвесторов и рекламы. Если приложение вам помогает - вы можете поддержать его развитие.</p>
-                        <p class="text-slate-400 text-sm mt-2"><strong>О будущей лицензии:</strong> Появится лицензия, которая откроет доступ к ПК‑версии Zaroli и локальной синхронизации между устройствами. Это позволит развивать приложение быстрее и оставаться независимым, сохраняя главный принцип - всё хранится только у вас.</p>
-                    </details>
-                    <details class="bg-slate-800/50 rounded-xl p-4 cursor-pointer">
-                        <summary class="font-medium text-slate-200 text-sm">Как купить ключ?</summary>
-                        <p class="text-slate-400 text-sm mt-2">Нажмите «Купить», введите email, оплатите картой. Ключ придёт на email.</p>
-                    </details>
-                    <details class="bg-slate-800/50 rounded-xl p-4 cursor-pointer">
-                        <summary class="font-medium text-slate-200 text-sm">Ключ не пришёл</summary>
-                        <p class="text-slate-400 text-sm mt-2">Проверьте папку «Спам». Если нет - нажмите «Ключи» → «Отправить ключи на email».</p>
-                    </details>
-                    <details class="bg-slate-800/50 rounded-xl p-4 cursor-pointer">
-                        <summary class="font-medium text-slate-200 text-sm">Сколько ключей можно купить?</summary>
-                        <p class="text-slate-400 text-sm mt-2">Неограниченно. Каждая покупка - новый ключ.</p>
-                    </details>
-                    <details class="bg-slate-800/50 rounded-xl p-4 cursor-pointer">
-                        <summary class="font-medium text-slate-200 text-sm">Как отвязать ключ?</summary>
-                        <p class="text-slate-400 text-sm mt-2">Нажмите «Ключи» → «Отвязать ключ», введите ключ. Он отвяжется от устройства.</p>
-                    </details>
-                    <details class="bg-slate-800/50 rounded-xl p-4 cursor-pointer">
-                        <summary class="font-medium text-slate-200 text-sm">Безопасность</summary>
-                        <p class="text-slate-400 text-sm mt-2">Для защиты ваших ключей мы используем подтверждение через email. Только владелец email может управлять ключами.</p>
-                    </details>
-                    <details class="bg-slate-800/50 rounded-xl p-4 cursor-pointer">
-                        <summary class="font-medium text-slate-200 text-sm">Связаться с поддержкой</summary>
-                        <p class="text-slate-400 text-sm mt-2">Напишите на <a href="mailto:mangaseiyuu@gmail.com" class="text-blue-400 hover:underline">mangaseiyuu@gmail.com</a></p>
-                    </details>
-                </div>
-            </div>
-
         </div>
 
-        <!-- Nav -->
-        <nav class="bg-slate-900 border-t border-white/10 p-2 z-10 shrink-0">
-            <div class="grid grid-cols-5 gap-1">
-                <button onclick="navigateTo('home')" class="nav-btn active flex flex-col items-center justify-center p-2 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-white/5 transition-all" data-target="home">
-                    <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v9a1 1 0 001 1h12a1 1 0 001-1v-9"></path></svg>
-                    <span class="text-[9px]">Главная</span>
-                </button>
-                <button onclick="navigateTo('buy')" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-white/5 transition-all" data-target="buy">
-                    <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7a2 2 0 012-2z"></path></svg>
-                    <span class="text-[9px]">Купить</span>
-                </button>
-                <button onclick="navigateTo('auth')" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-white/5 transition-all" data-target="auth">
-                    <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.65 10A5.99 5.99 0 007 6c-3.31 0-6 2.69-6 6s2.69 6 6 6a5.99 5.99 0 005.65-4H17v4h4v-4h2v-4H12.65zM7 14a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                    <span class="text-[9px]">Ключи</span>
-                </button>
-                <button onclick="navigateTo('transfer')" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-white/5 transition-all" data-target="transfer">
-                    <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
-                    <span class="text-[9px]">Отвязать</span>
-                </button>
-                <button onclick="navigateTo('help')" class="nav-btn flex flex-col items-center justify-center p-2 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-white/5 transition-all" data-target="help">
-                    <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span class="text-[9px]">Помощь</span>
-                </button>
+        <!-- Оформление доступа -->
+        <div class="page" id="page-buy">
+            <div class="hero">
+                <h1 class="hero-title" style="font-size: 42px;">Оформление доступа</h1>
+                <p class="hero-subtitle">Введите email для получения ключа</p>
             </div>
-        </nav>
-    </main>
+
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">Email адрес</label>
+                    <input type="email" class="form-input" placeholder="your@email.com">
+                </div>
+                
+                <a href="#" class="btn-primary" style="width: 100%; text-align: center; display: block;">Перейти к оплате — 99 ₽</a>
+                
+                <p class="card-text" style="text-align: center; margin-top: 25px; font-size: 14px;">
+                    Ключ придёт на email после оплаты.
+                </p>
+            </div>
+
+            <a href="#" class="btn-back" onclick="showPage('page-home')">← Назад</a>
+        </div>
+
+        <!-- Мои ключи - Email -->
+        <div class="page" id="page-keys">
+            <div class="hero">
+                <h1 class="hero-title" style="font-size: 42px;">Мои ключи</h1>
+                <p class="hero-subtitle">Введите email для получения кода подтверждения</p>
+            </div>
+
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">Email адрес</label>
+                    <input type="email" class="form-input" placeholder="your@email.com">
+                </div>
+                
+                <a href="#" class="btn-primary" style="width: 100%; text-align: center; display: block;" onclick="showPage('page-keys-code')">Отправить код</a>
+                
+                <div class="security-notice">
+                    <span class="security-notice-icon">🔒</span>
+                    <span class="security-notice-text">Для безопасности мы отправим код подтверждения на ваш email. Ключи будут показаны только после ввода кода.</span>
+                </div>
+            </div>
+
+            <a href="#" class="btn-back" onclick="showPage('page-home')">← Назад</a>
+        </div>
+
+        <!-- Мои ключи - Код -->
+        <div class="page" id="page-keys-code">
+            <div class="hero">
+                <h1 class="hero-title" style="font-size: 42px;">Введите код</h1>
+                <p class="hero-subtitle">Мы отправили код на your@email.com</p>
+            </div>
+
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">Код подтверждения (6 цифр)</label>
+                    <input type="text" class="form-input" placeholder="000000" maxlength="6" style="text-align: center; font-size: 28px; letter-spacing: 10px; font-family: 'Courier New', monospace;">
+                </div>
+                
+                <a href="#" class="btn-primary" style="width: 100%; text-align: center; display: block;" onclick="showPage('page-keys-list')">Подтвердить</a>
+                
+                <div class="timer-text">
+                    <a href="#" class="resend-link">Отправить код повторно</a>
+                    <br>
+                    <span style="font-size: 13px; opacity: 0.6; margin-top: 8px; display: block;">Повторная отправка через 60 сек.</span>
+                </div>
+            </div>
+
+            <a href="#" class="btn-back" onclick="showPage('page-keys')">← Назад</a>
+        </div>
+
+        <!-- Мои ключи - Список -->
+        <div class="page" id="page-keys-list">
+            <div class="hero">
+                <h1 class="hero-title" style="font-size: 42px;">Мои ключи</h1>
+                <p class="hero-subtitle">Email: your@email.com</p>
+            </div>
+
+            <div class="card">
+                <div class="key-item">
+                    <span class="key-code">ZRL-A1B2-C3D4-E5F6</span>
+                    <div class="key-actions">
+                        <button class="btn-small">Отвязать ключ</button>
+                    </div>
+                </div>
+                <div class="key-item">
+                    <span class="key-code">ZRL-X7Y8-Z9W0-V1U2</span>
+                    <div class="key-actions">
+                        <button class="btn-small">Отвязать ключ</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; display: flex; gap: 12px; flex-wrap: wrap;">
+                    <a href="#" class="btn-secondary">Отправить ключи на email</a>
+                </div>
+            </div>
+
+            <a href="#" class="btn-back" onclick="showPage('page-home')">← Назад</a>
+        </div>
+
+        <!-- Отвязка ключа -->
+        <div class="page" id="page-unbind">
+            <div class="hero">
+                <h1 class="hero-title" style="font-size: 42px;">Отвязка ключа</h1>
+                <p class="hero-subtitle">Введите ключ для отвязки от устройства</p>
+            </div>
+
+            <div class="card">
+                <div class="warning-box">
+                    <span class="warning-text">⚠ Внимание: После отвязки ключ перестанет работать на текущем устройстве.</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Ключ (ZRL-XXXX-XXXX-XXXX)</label>
+                    <input type="text" class="form-input" placeholder="ZRL-XXXX-XXXX-XXXX" style="font-family: 'Courier New', monospace; letter-spacing: 2px;">
+                </div>
+                
+                <a href="#" class="btn-primary" style="width: 100%; text-align: center; display: block;">Отвязать ключ</a>
+            </div>
+
+            <a href="#" class="btn-back" onclick="showPage('page-home')">← Назад</a>
+        </div>
+
+        <!-- Помощь -->
+        <div class="page" id="page-help">
+            <div class="hero">
+                <h1 class="hero-title" style="font-size: 42px;">Помощь</h1>
+            </div>
+
+            <div class="card">
+                <div class="help-item">
+                    <h3 class="help-question">О разработке Zaroli</h3>
+                    <p class="help-answer">Zaroli создаётся вручную, без инвесторов и рекламы. Если приложение вам помогает — вы можете поддержать его развитие.</p>
+                    <p class="help-answer" style="margin-top: 12px;"><strong style="color: var(--gold-light);">О будущей лицензии:</strong> Появится лицензия, которая откроет доступ к ПК‑версии Zaroli и локальной синхронизации между устройствами. Это позволит развивать приложение быстрее и оставаться независимым, сохраняя главный принцип — всё хранится только у вас.</p>
+                </div>
+
+                <div class="help-item">
+                    <h3 class="help-question">Как купить ключ?</h3>
+                    <p class="help-answer">Нажмите «Купить», введите email, оплатите картой. Ключ придёт на email.</p>
+                </div>
+
+                <div class="help-item">
+                    <h3 class="help-question">Ключ не пришёл</h3>
+                    <p class="help-answer">Проверьте папку «Спам». Если нет — нажмите «Ключи» → «Отправить ключи на email».</p>
+                </div>
+
+                <div class="help-item">
+                    <h3 class="help-question">Сколько ключей можно купить?</h3>
+                    <p class="help-answer">Неограниченно. Каждая покупка — новый ключ.</p>
+                </div>
+
+                <div class="help-item">
+                    <h3 class="help-question">Как отвязать ключ?</h3>
+                    <p class="help-answer">Нажмите «Ключи» → «Отвязать ключ», введите ключ. Он отвяжется от устройства.</p>
+                </div>
+
+                <div class="help-item">
+                    <h3 class="help-question">Безопасность</h3>
+                    <p class="help-answer">Для защиты ваших ключей мы используем подтверждение через email. Только владелец email может управлять ключами.</p>
+                </div>
+
+                <div class="help-item">
+                    <h3 class="help-question">Связаться с поддержкой</h3>
+                    <p class="help-answer">Напишите на <a href="mailto:mangaseiyuu@gmail.com">mangaseiyuu@gmail.com</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Нижняя навигация -->
+    <nav class="nav-bottom">
+        <a href="#" class="nav-link active" onclick="showPage('page-home')">Главная</a>
+        <a href="#" class="nav-link" onclick="showPage('page-buy')">Купить</a>
+        <a href="#" class="nav-link" onclick="showPage('page-keys')">Ключи</a>
+        <a href="#" class="nav-link" onclick="showPage('page-unbind')">Отвязать</a>
+        <a href="#" class="nav-link" onclick="showPage('page-help')">Помощь</a>
+    </nav>
 
     <script>
-        // ── Конфигурация ──────────────────────────────────────────
-        const API_GATEWAY_URL = "https://d5d1jgohm0a75ai04lis.tmjd4m4j.apigw.yandexcloud.net";
-        
-        // ── Вспомогательные функции ───────────────────────────────
-        
-        /**
-         * Экранирование HTML для предотвращения XSS
-         * @param {string} text - Текст для экранирования
-         * @returns {string} - Экранированный текст
-         */
-        function escapeHtml(text) {
-            if (text === null || text === undefined) return '';
-            const div = document.createElement('div');
-            div.textContent = String(text);
-            return div.innerHTML;
-        }
-        
-        /**
-         * Валидация формата email
-         * @param {string} email - Email для проверки
-         * @returns {boolean} - Результат валидации
-         */
-        function isValidEmail(email) {
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-        }
-        
-        /**
-         * Валидация формата ключа
-         * @param {string} key - Ключ для проверки
-         * @returns {boolean} - Результат валидации
-         */
-        function isValidKeyFormat(key) {
-            return /^ZRL-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key);
-        }
-        
-        /**
-         * Показать сообщение об ошибке пользователю
-         * @param {string} message - Сообщение об ошибке
-         */
-        function showError(message) {
-            // Используем более дружелюбное уведомление вместо alert
-            const errorContainer = document.getElementById('global-error');
-            if (errorContainer) {
-                errorContainer.textContent = message;
-                errorContainer.classList.remove('hidden');
-                setTimeout(() => errorContainer.classList.add('hidden'), 5000);
-            } else {
-                alert(message);
-            }
-        }
-        
-        /**
-         * Показать успешное сообщение
-         * @param {string} message - Сообщение об успехе
-         */
-        function showSuccess(message) {
-            const successContainer = document.getElementById('global-success');
-            if (successContainer) {
-                successContainer.textContent = message;
-                successContainer.classList.remove('hidden');
-                setTimeout(() => successContainer.classList.add('hidden'), 5000);
-            } else {
-                alert(message);
-            }
-        }
-
-        // ── Состояние приложения ─────────────────────────────────
-        // ИСПРАВЛЕНИЕ: Используем sessionStorage вместо localStorage для безопасности
-        let appState = {
-            email: sessionStorage.getItem("userEmail") || "",
-            token: sessionStorage.getItem("userToken") || "",
-            resendTimer: null,
-            resendCooldown: 60
-        };
-
-        function navigateTo(viewName) {
-            // Если пользователь авторизован и пытается перейти на страницу авторизации - перенаправляем на ключи
-            if (viewName === 'auth' && appState.token) {
-                viewName = 'keys';
-            }
-            
-            document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
-            const view = document.getElementById(`view-${viewName}`);
-            if (view) view.classList.remove('hidden');
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.querySelector(`[data-target="${viewName}"]`);
-            if (activeBtn) activeBtn.classList.add('active');
-            document.getElementById('content-area').scrollTop = 0;
-            
-            // Показываем/скрываем кнопку "Выйти" в зависимости от авторизации
-            if (appState.token) {
-                document.getElementById("logout-btn").classList.remove("hidden");
-            } else {
-                document.getElementById("logout-btn").classList.add("hidden");
-            }
-            
-            // Если переходим на страницу ключей - загружаем их
-            if (viewName === 'keys' && appState.token) {
-                loadKeys();
-            }
-        }
-
-        function logout() {
-            appState.email = "";
-            appState.token = "";
-            // ИСПРАВЛЕНИЕ: sessionStorage вместо localStorage
-            sessionStorage.removeItem("userEmail");
-            sessionStorage.removeItem("userToken");
-            document.getElementById("logout-btn").classList.add("hidden");
-            
-            // Очищаем таймер
-            if (appState.resendTimer) {
-                clearInterval(appState.resendTimer);
-                appState.resendTimer = null;
-            }
-            
-            navigateTo("home");
-        }
-
-        // ── Шаг 1: Запрос кода ─────────────────────────────────────
-        async function requestCode() {
-            const emailInput = document.getElementById("auth-email");
-            const email = emailInput.value.trim().toLowerCase();
-            
-            // ИСПРАВЛЕНИЕ: Улучшенная валидация email
-            if (!email || !isValidEmail(email)) {
-                showError("Введите корректный email");
-                return;
-            }
-
-            const btn = document.getElementById("request-code-btn");
-            btn.disabled = true;
-            btn.textContent = "Отправка…";
-
-            try {
-                const res = await fetch(API_GATEWAY_URL + "/request-code", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({email})
-                });
-                
-                const data = await res.json();
-                
-                if (res.ok) {
-                    // ИСПРАВЛЕНИЕ: sessionStorage вместо localStorage
-                    appState.email = email;
-                    sessionStorage.setItem("userEmail", email);
-                    
-                    document.getElementById("verify-email-display").textContent = email;
-                    document.getElementById("verify-code-input").value = "";
-                    document.getElementById("verify-error").classList.add("hidden");
-                    
-                    navigateTo("verify");
-                    startResendTimer();
-                } else {
-                    showError("Ошибка: " + (data.error || "Неизвестная ошибка"));
-                }
-            } catch(e) {
-                // ИСПРАВЛЕНИЕ: Более понятное сообщение об ошибке
-                showError("Не удалось подключиться к серверу. Проверьте подключение к интернету.");
-                console.error("Network error:", e);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = "Отправить код";
-            }
-        }
-
-        // ── Шаг 2: Верификация кода ────────────────────────────────
-        async function verifyCode() {
-            const codeInput = document.getElementById("verify-code-input");
-            const code = codeInput.value.trim();
-            
-            if (!code || code.length !== 6) {
-                showVerifyError("Введите 6-значный код");
-                return;
-            }
-
-            const btn = document.getElementById("verify-code-btn");
-            btn.disabled = true;
-            btn.textContent = "Проверка…";
-
-            try {
-                const res = await fetch(API_GATEWAY_URL + "/verify-code", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        email: appState.email,
-                        code: code
-                    })
-                });
-                
-                const data = await res.json();
-                
-                if (res.ok && data.token) {
-                    // ИСПРАВЛЕНИЕ: sessionStorage вместо localStorage
-                    appState.token = data.token;
-                    sessionStorage.setItem("userToken", data.token);
-                    
-                    // Очищаем таймер
-                    if (appState.resendTimer) {
-                        clearInterval(appState.resendTimer);
-                        appState.resendTimer = null;
-                    }
-                    
-                    // Показываем ключи
-                    document.getElementById("logout-btn").classList.remove("hidden");
-                    navigateTo("keys");
-                    await loadKeys();
-                } else {
-                    showVerifyError(data.error || "Неверный код");
-                    codeInput.value = "";
-                    codeInput.focus();
-                }
-            } catch(e) {
-                showVerifyError("Не удалось подключиться к серверу. Проверьте подключение к интернету.");
-                console.error("Network error:", e);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = "Подтвердить";
-            }
-        }
-
-        function showVerifyError(message) {
-            const errorEl = document.getElementById("verify-error");
-            errorEl.textContent = message;
-            errorEl.classList.remove("hidden");
-        }
-
-        // ── Таймер повторной отправки ──────────────────────────────
-        function startResendTimer() {
-            const btn = document.getElementById("resend-code-btn");
-            const timerEl = document.getElementById("timer-seconds");
-            const timerContainer = document.getElementById("resend-timer");
-            
-            btn.disabled = true;
-            timerContainer.classList.remove("hidden");
-            
-            let remaining = appState.resendCooldown;
-            timerEl.textContent = remaining;
-            
-            if (appState.resendTimer) {
-                clearInterval(appState.resendTimer);
-            }
-            
-            appState.resendTimer = setInterval(() => {
-                remaining--;
-                timerEl.textContent = remaining;
-                
-                if (remaining <= 0) {
-                    clearInterval(appState.resendTimer);
-                    appState.resendTimer = null;
-                    btn.disabled = false;
-                    timerContainer.classList.add("hidden");
-                }
-            }, 1000);
-        }
-
-        // ── Шаг 3: Загрузка ключей ─────────────────────────────────
-        async function loadKeys() {
-            if (!appState.token) {
-                navigateTo("auth");
-                return;
-            }
-
-            document.getElementById("user-email-display").textContent = appState.email;
-            const list = document.getElementById("keys-list");
-            // ИСПРАВЛЕНИЕ: Спиннер загрузки вместо текста
-            list.innerHTML = '<div class="spinner"></div>';
-
-            try {
-                const res = await fetch(API_GATEWAY_URL + "/get-keys", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({token: appState.token})
-                });
-                
-                const data = await res.json();
-                
-                if (res.ok && data.keys && data.keys.length > 0) {
-                    // Карточка ключа: ключ одной строкой, кнопка копировать, статус, скрытый device_id
-                    list.innerHTML = data.keys.map(k => {
-                        const status = (k.status || '').toLowerCase();
-                        const hasDevice = k.device_id && k.device_id !== '';
-                        const isBound = status === 'активен' || status === 'active' || hasDevice;
-                        const statusText = isBound ? 'Активен' : 'Свободен';
-                        const statusColor = isBound ? 'text-green-400' : 'text-yellow-400';
-                        const statusBg = isBound ? 'bg-green-500/10 border-green-500/30' : 'bg-yellow-500/10 border-yellow-500/30';
-                        const purchaseDate = k.purchase_date ? new Date(k.purchase_date).toLocaleDateString('ru-RU') : '';
-                        
-                        return `
-                        <div class="key-card rounded-xl p-4">
-                            <!-- Ключ и кнопка копировать -->
-                            <div class="flex items-center justify-between gap-2 mb-3">
-                                <code class="text-blue-400 font-bold text-base tracking-wider whitespace-nowrap flex-1 min-w-0">${escapeHtml(k.key)}</code>
-                                <button onclick="copyKey('${escapeHtml(k.key)}')" class="shrink-0 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 w-8 h-8 rounded-lg transition-colors flex items-center justify-center" title="Копировать">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                                </button>
-                            </div>
-                            
-                            <!-- Статус -->
-                            <div class="flex items-center gap-2">
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusBg} ${statusColor} border">
-                                    ${escapeHtml(statusText)}
-                                </span>
-                            </div>
-                            
-                            <!-- Скрытый device_id (для внутреннего использования) -->
-                            <div class="hidden" data-device-id="${escapeHtml(k.device_id || '')}"></div>
-                        </div>
-                    `;}).join('');
-                } else if (res.ok && data.keys && data.keys.length === 0) {
-                    list.innerHTML = '<p class="text-slate-500 text-sm">Ключи не найдены. Купите первый ключ!</p>';
-                } else {
-                    // Токен недействителен
-                    if (res.status === 401) {
-                        logout();
-                        showError("Сессия истекла. Пожалуйста, войдите снова.");
-                    } else {
-                        list.innerHTML = '<p class="text-red-400 text-sm">Ошибка: ' + escapeHtml(data.error || 'Неизвестная') + '</p>';
-                    }
-                }
-            } catch(e) {
-                list.innerHTML = '<p class="text-red-400 text-sm">Ошибка загрузки. Попробуйте позже.</p>';
-                console.error("Load keys error:", e);
-            }
-        }
-
-        // ── Копирование ключа ───────────────────────────────────────
-        function copyKey(key) {
-            navigator.clipboard.writeText(key).then(() => {
-                showSuccess("Ключ скопирован!");
-            }).catch(() => {
-                // Fallback для старых браузеров
-                const textarea = document.createElement('textarea');
-                textarea.value = key;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                showSuccess("Ключ скопирован!");
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
             });
+            document.getElementById(pageId).classList.add('active');
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ── Отправка ключей на email ───────────────────────────────
-        // ИСПРАВЛЕНИЕ: Используем POST с токеном вместо GET с email
-        async function restoreKeys() {
-            if (!appState.token) {
-                showError("Необходима авторизация");
-                return;
+        // Timer for resend
+        let timer = 60;
+        setInterval(() => {
+            if (timer > 0) {
+                timer--;
             }
-
-            const btn = document.querySelector('button[onclick="restoreKeys()"]');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div>';
-
-            try {
-                // ИСПРАВЛЕНИЕ: POST запрос с токеном вместо GET с email в query string
-                const res = await fetch(API_GATEWAY_URL + "/restore-keys", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({token: appState.token})
-                });
-                const data = await res.json();
-                if (data.count > 0) {
-                    showSuccess(`Отправлено ${data.count} ключей на ${appState.email}. Проверьте почту (и папку Спам).`);
-                } else {
-                    showError("Ключи не найдены для этого email.");
-                }
-            } catch(e) {
-                showError("Не удалось отправить ключи. Попробуйте позже.");
-                console.error("Restore keys error:", e);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
-        }
-
-        // ── Отвязка ключа ──────────────────────────────────────────
-        async function performDetach() {
-            const keyInput = document.getElementById("transfer-key-input");
-            const key = keyInput.value.trim().toUpperCase();
-            
-            // ИСПРАВЛЕНИЕ: Валидация формата ключа
-            if (!key) {
-                showError("Введите ключ");
-                return;
-            }
-            
-            if (!isValidKeyFormat(key)) {
-                showError("Некорректный формат ключа. Ожидается: ZRL-XXXX-XXXX-XXXX");
-                return;
-            }
-            
-            if (!appState.token) {
-                showError("Необходима авторизация");
-                navigateTo("auth");
-                return;
-            }
-
-            if (!confirm("Вы уверены? Ключ перестанет работать на текущем устройстве.")) {
-                return;
-            }
-
-            const btn = document.querySelector('button[onclick="performDetach()"]');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div>';
-
-            try {
-                const res = await fetch(API_GATEWAY_URL + "/manage-key", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        token: appState.token,
-                        key: key,
-                        action: "detach"
-                    })
-                });
-                
-                const data = await res.json();
-                
-                if (res.ok) {
-                    showSuccess(data.message || "Ключ успешно отвязан");
-                    keyInput.value = "";
-                    
-                    // Обновляем список ключей если мы на странице ключей
-                    if (!document.getElementById("view-keys").classList.contains("hidden")) {
-                        await loadKeys();
-                    }
-                } else {
-                    showError("Ошибка: " + (data.error || "Неизвестная ошибка"));
-                }
-            } catch(e) {
-                showError("Не удалось отвязать ключ. Попробуйте позже.");
-                console.error("Detach error:", e);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
-        }
-
-        // ── Инициализация ──────────────────────────────────────────
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById("buy-button")?.addEventListener("click", goPayment);
-            
-            // Восстанавливаем сессию если есть токен
-            if (appState.token && appState.email) {
-                document.getElementById("logout-btn").classList.remove("hidden");
-                document.getElementById("user-email-display").textContent = appState.email;
-            }
-        });
-
-        // ── Оплата ─────────────────────────────────────────────────
-        async function goPayment() {
-            const email = document.getElementById("buy-email").value.trim();
-            // ИСПРАВЛЕНИЕ: Улучшенная валидация email
-            if (!email || !isValidEmail(email)) {
-                showError("Введите корректный email");
-                return;
-            }
-            const btn = document.getElementById("buy-button");
-            btn.disabled = true;
-            btn.textContent = "Создание…";
-            try {
-                const res = await fetch(API_GATEWAY_URL + "/create-payment", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({email})
-                });
-                const data = await res.json();
-                if (data.confirmation_url) {
-                    window.location.href = data.confirmation_url;
-                } else {
-                    showError("Ошибка: " + (data.error || "Неизвестная"));
-                    btn.disabled = false;
-                    btn.textContent = "Перейти к оплате — 99 ₽";
-                }
-            } catch(e) {
-                showError("Не удалось создать платёж. Попробуйте позже.");
-                console.error("Payment error:", e);
-                btn.disabled = false;
-                btn.textContent = "Перейти к оплате — 99 ₽";
-            }
-        }
+        }, 1000);
     </script>
 </body>
 </html>
+
