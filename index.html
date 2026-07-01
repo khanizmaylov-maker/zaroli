@@ -181,6 +181,8 @@
             border-radius: 6px;
             transition: all 0.3s ease;
             letter-spacing: 0.5px;
+            cursor: pointer;
+            background: none;
         }
 
         .btn-logout:hover {
@@ -507,6 +509,8 @@
             transition: all 0.3s ease;
             margin-top: 25px;
             letter-spacing: 0.5px;
+            cursor: pointer;
+            background: none;
         }
 
         .btn-back:hover {
@@ -688,6 +692,9 @@
             transition: all 0.3s ease;
             letter-spacing: 0.3px;
             font-weight: 500;
+            cursor: pointer;
+            background: none;
+            border: none;
         }
 
         .nav-link:hover, .nav-link.active {
@@ -724,6 +731,8 @@
             text-decoration: none;
             cursor: pointer;
             transition: all 0.3s ease;
+            background: none;
+            border: none;
         }
 
         .resend-link:hover {
@@ -836,14 +845,14 @@
 
     <header>
         <div class="logo-container">
-            <img src="gerb.png" alt="Герб Zaroli" class="logo-icon floating">
+            <img src="favicon.png" alt="Zaroli" class="logo-icon floating">
             <div>
                 <div class="logo">Zaroli</div>
                 <div class="logo-sub">Пожизненный доступ</div>
             </div>
         </div>
         <div class="header-right">
-            <a href="#" class="btn-logout">Выйти</a>
+            <button class="btn-logout" id="logout-btn" onclick="logout()" style="display: none;">Выйти</button>
         </div>
     </header>
 
@@ -869,7 +878,7 @@
                 
                 <div class="features">
                     <div class="feature-item">
-                        <span class="feature-icon"></span>
+                        <span class="feature-icon">✓</span>
                         <span class="feature-text">Доступ ко всем функциям</span>
                     </div>
                     <div class="feature-item">
@@ -878,11 +887,11 @@
                     </div>
                 </div>
 
-                <a href="#" class="btn-primary" onclick="showPage('page-buy')">Купить ключ — 99 ₽</a>
+                <button class="btn-primary" onclick="showPage('page-buy')">Купить ключ — 99 ₽</button>
             </div>
 
             <div style="text-align: center; margin-top: 35px;">
-                <a href="#" class="btn-secondary" onclick="showPage('page-keys')">Мои ключи</a>
+                <button class="btn-secondary" onclick="showPage('page-keys')">Мои ключи</button>
             </div>
         </div>
 
@@ -896,17 +905,17 @@
             <div class="card">
                 <div class="form-group">
                     <label class="form-label">Email адрес</label>
-                    <input type="email" class="form-input" placeholder="your@email.com">
+                    <input type="email" id="buy-email" class="form-input" placeholder="your@email.com">
                 </div>
                 
-                <a href="#" class="btn-primary" style="width: 100%; text-align: center; display: block;">Перейти к оплате — 99 ₽</a>
+                <button class="btn-primary" id="buy-button" style="width: 100%; text-align: center;">Перейти к оплате — 99 ₽</button>
                 
                 <p class="card-text" style="text-align: center; margin-top: 25px; font-size: 14px;">
                     Ключ придёт на email после оплаты.
                 </p>
             </div>
 
-            <a href="#" class="btn-back" onclick="showPage('page-home')">← Назад</a>
+            <button class="btn-back" onclick="showPage('page-home')">← Назад</button>
         </div>
 
         <!-- Мои ключи - Email -->
@@ -919,72 +928,69 @@
             <div class="card">
                 <div class="form-group">
                     <label class="form-label">Email адрес</label>
-                    <input type="email" class="form-input" placeholder="your@email.com">
+                    <input type="email" id="auth-email" class="form-input" placeholder="your@email.com">
                 </div>
                 
-                <a href="#" class="btn-primary" style="width: 100%; text-align: center; display: block;" onclick="showPage('page-keys-code')">Отправить код</a>
+                <button class="btn-primary" id="request-code-btn" style="width: 100%; text-align: center;" onclick="requestCode()">Отправить код</button>
                 
                 <div class="security-notice">
                     <span class="security-notice-icon">🔒</span>
-                    <span class="security-notice-text">Для безопасности мы отправим код подтверждения на ваш email. Ключи будут показаны только после ввода кода.</span>
+                    <span class="security-notice-text">Для безопасности мы отправим код подтверждения на ваш email. Ключи будут показаны только после верификации.</span>
                 </div>
             </div>
 
-            <a href="#" class="btn-back" onclick="showPage('page-home')">← Назад</a>
+            <button class="btn-back" onclick="showPage('page-home')">← Назад</button>
         </div>
 
         <!-- Мои ключи - Код -->
         <div class="page" id="page-keys-code">
             <div class="hero">
                 <h1 class="hero-title" style="font-size: 42px;">Введите код</h1>
-                <p class="hero-subtitle">Мы отправили код на your@email.com</p>
+                <p class="hero-subtitle">Мы отправили код на <span id="verify-email-display"></span></p>
             </div>
 
             <div class="card">
                 <div class="form-group">
                     <label class="form-label">Код подтверждения (6 цифр)</label>
-                    <input type="text" class="form-input" placeholder="000000" maxlength="6" style="text-align: center; font-size: 28px; letter-spacing: 10px; font-family: 'Courier New', monospace;">
+                    <input type="text" id="verify-code-input" class="form-input" placeholder="000000" maxlength="6" style="text-align: center; font-size: 28px; letter-spacing: 10px; font-family: 'Courier New', monospace;">
                 </div>
                 
-                <a href="#" class="btn-primary" style="width: 100%; text-align: center; display: block;" onclick="showPage('page-keys-list')">Подтвердить</a>
+                <button class="btn-primary" id="verify-code-btn" style="width: 100%; text-align: center;" onclick="verifyCode()">Подтвердить</button>
                 
                 <div class="timer-text">
-                    <a href="#" class="resend-link">Отправить код повторно</a>
+                    <button class="resend-link" id="resend-code-btn" onclick="requestCode()">Отправить код повторно</button>
                     <br>
-                    <span style="font-size: 13px; opacity: 0.6; margin-top: 8px; display: block;">Повторная отправка через 60 сек.</span>
+                    <span style="font-size: 13px; opacity: 0.6; margin-top: 8px; display: block;" id="resend-timer" style="display: none;">Повторная отправка через <span id="timer-seconds">60</span> сек.</span>
                 </div>
             </div>
 
-            <a href="#" class="btn-back" onclick="showPage('page-keys')">← Назад</a>
+            <button class="btn-back" onclick="showPage('page-keys')">← Назад</button>
         </div>
 
         <!-- Мои ключи - Список -->
         <div class="page" id="page-keys-list">
             <div class="hero">
                 <h1 class="hero-title" style="font-size: 42px;">Мои ключи</h1>
-                <p class="hero-subtitle">Email: your@email.com</p>
+                <p class="hero-subtitle">Email: <span id="user-email-display"></span></p>
             </div>
 
             <div class="card">
-                <div class="key-item">
-                    <span class="key-code">ZRL-A1B2-C3D4-E5F6</span>
-                    <div class="key-actions">
-                        <button class="btn-small">Отвязать ключ</button>
-                    </div>
-                </div>
-                <div class="key-item">
-                    <span class="key-code">ZRL-X7Y8-Z9W0-V1U2</span>
-                    <div class="key-actions">
-                        <button class="btn-small">Отвязать ключ</button>
+                <div id="keys-list">
+                    <div class="key-item">
+                        <span class="key-code">ZRL-A1B2-C3D4-E5F6</span>
+                        <div class="key-actions">
+                            <button class="btn-small" onclick="copyKey('ZRL-A1B2-C3D4-E5F6')">Копировать</button>
+                            <button class="btn-small" onclick="showPage('page-unbind')">Отвязать</button>
+                        </div>
                     </div>
                 </div>
 
                 <div style="margin-top: 30px; display: flex; gap: 12px; flex-wrap: wrap;">
-                    <a href="#" class="btn-secondary">Отправить ключи на email</a>
+                    <button class="btn-secondary" onclick="restoreKeys()">Отправить ключи на email</button>
                 </div>
             </div>
 
-            <a href="#" class="btn-back" onclick="showPage('page-home')">← Назад</a>
+            <button class="btn-back" onclick="showPage('page-home')">← Назад</button>
         </div>
 
         <!-- Отвязка ключа -->
@@ -1001,13 +1007,13 @@
 
                 <div class="form-group">
                     <label class="form-label">Ключ (ZRL-XXXX-XXXX-XXXX)</label>
-                    <input type="text" class="form-input" placeholder="ZRL-XXXX-XXXX-XXXX" style="font-family: 'Courier New', monospace; letter-spacing: 2px;">
+                    <input type="text" id="transfer-key-input" class="form-input" placeholder="ZRL-XXXX-XXXX-XXXX">
                 </div>
                 
-                <a href="#" class="btn-primary" style="width: 100%; text-align: center; display: block;">Отвязать ключ</a>
+                <button class="btn-primary" id="detach-btn" style="width: 100%; text-align: center; background: linear-gradient(135deg, #8B0000, #DC143C);" onclick="performDetach()">Отвязать ключ</button>
             </div>
 
-            <a href="#" class="btn-back" onclick="showPage('page-home')">← Назад</a>
+            <button class="btn-back" onclick="showPage('page-keys-list')">← Назад</button>
         </div>
 
         <!-- Помощь -->
@@ -1018,75 +1024,452 @@
 
             <div class="card">
                 <div class="help-item">
-                    <h3 class="help-question">О разработке Zaroli</h3>
-                    <p class="help-answer">Zaroli создаётся вручную, без инвесторов и рекламы. Если приложение вам помогает — вы можете поддержать его развитие.</p>
-                    <p class="help-answer" style="margin-top: 12px;"><strong style="color: var(--gold-light);">О будущей лицензии:</strong> Появится лицензия, которая откроет доступ к ПК‑версии Zaroli и локальной синхронизации между устройствами. Это позволит развивать приложение быстрее и оставаться независимым, сохраняя главный принцип — всё хранится только у вас.</p>
+                    <div class="help-question">Как купить ключ?</div>
+                    <div class="help-answer">Нажмите «Купить ключ», введите email, оплатите картой. Ключ придёт на email сразу после оплаты.</div>
                 </div>
 
                 <div class="help-item">
-                    <h3 class="help-question">Как купить ключ?</h3>
-                    <p class="help-answer">Нажмите «Купить», введите email, оплатите картой. Ключ придёт на email.</p>
+                    <div class="help-question">Ключ не пришёл</div>
+                    <div class="help-answer">Проверьте папку «Спам». Если ключ так и не появился, нажмите «Мои ключи» → «Отправить ключи на email» для повторной отправки.</div>
                 </div>
 
                 <div class="help-item">
-                    <h3 class="help-question">Ключ не пришёл</h3>
-                    <p class="help-answer">Проверьте папку «Спам». Если нет — нажмите «Ключи» → «Отправить ключи на email».</p>
+                    <div class="help-question">Сколько ключей можно купить?</div>
+                    <div class="help-answer">Неограниченное количество. Каждая новая покупка — это новый уникальный ключ.</div>
                 </div>
 
                 <div class="help-item">
-                    <h3 class="help-question">Сколько ключей можно купить?</h3>
-                    <p class="help-answer">Неограниченно. Каждая покупка — новый ключ.</p>
+                    <div class="help-question">Как отвязать ключ?</div>
+                    <div class="help-answer">Перейдите в раздел «Мои ключи», выберите нужный ключ и нажмите «Отвязать». Ключ отвяжется от текущего устройства и сможет использоваться на другом.</div>
                 </div>
 
                 <div class="help-item">
-                    <h3 class="help-question">Как отвязать ключ?</h3>
-                    <p class="help-answer">Нажмите «Ключи» → «Отвязать ключ», введите ключ. Он отвяжется от устройства.</p>
+                    <div class="help-question">Безопасность</div>
+                    <div class="help-answer">Для защиты ваших ключей мы используем двухфакторную верификацию через email. Только владелец email может получить доступ к ключам.</div>
                 </div>
 
                 <div class="help-item">
-                    <h3 class="help-question">Безопасность</h3>
-                    <p class="help-answer">Для защиты ваших ключей мы используем подтверждение через email. Только владелец email может управлять ключами.</p>
-                </div>
-
-                <div class="help-item">
-                    <h3 class="help-question">Связаться с поддержкой</h3>
-                    <p class="help-answer">Напишите на <a href="mailto:mangaseiyuu@gmail.com">mangaseiyuu@gmail.com</a></p>
+                    <div class="help-question">Связаться с поддержкой</div>
+                    <div class="help-answer">Если у вас есть вопросы, напишите на <a href="mailto:mangaseiyuu@gmail.com">mangaseiyuu@gmail.com</a></div>
                 </div>
             </div>
+
+            <button class="btn-back" onclick="showPage('page-home')">← Назад</button>
         </div>
     </div>
 
-    <!-- Нижняя навигация -->
+    <!-- Navigation -->
     <nav class="nav-bottom">
-        <a href="#" class="nav-link active" onclick="showPage('page-home')">Главная</a>
-        <a href="#" class="nav-link" onclick="showPage('page-buy')">Купить</a>
-        <a href="#" class="nav-link" onclick="showPage('page-keys')">Ключи</a>
-        <a href="#" class="nav-link" onclick="showPage('page-unbind')">Отвязать</a>
-        <a href="#" class="nav-link" onclick="showPage('page-help')">Помощь</a>
+        <button class="nav-link active" onclick="showPage('page-home'); setActiveNav(0)">Главная</button>
+        <button class="nav-link" onclick="showPage('page-buy'); setActiveNav(1)">Купить</button>
+        <button class="nav-link" onclick="showPage('page-keys'); setActiveNav(2)">Ключи</button>
+        <button class="nav-link" onclick="showPage('page-unbind'); setActiveNav(3)">Отвязать</button>
+        <button class="nav-link" onclick="showPage('page-help'); setActiveNav(4)">Помощь</button>
     </nav>
 
     <script>
+        // ── Конфигурация ──────────────────────────────────────────
+        const API_GATEWAY_URL = "https://d5d1jgohm0a75ai04lis.tmjd4m4j.apigw.yandexcloud.net";
+        
+        // ── Состояние приложения ─────────────────────────────────
+        let appState = {
+            email: sessionStorage.getItem("userEmail") || "",
+            token: sessionStorage.getItem("userToken") || "",
+            resendTimer: null,
+            resendCooldown: 60
+        };
+
+        // ── Вспомогательные функции ───────────────────────────────
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function isValidKeyFormat(key) {
+            return /^ZRL-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key);
+        }
+
+        function showError(message) {
+            alert(message);
+        }
+
+        function showSuccess(message) {
+            alert(message);
+        }
+
+        // ── Управление страницами ─────────────────────────────────
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => {
                 page.classList.remove('active');
             });
-            document.getElementById(pageId).classList.add('active');
             
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
+            const page = document.getElementById(pageId);
+            if (page) {
+                page.classList.add('active');
+            }
             
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo(0, 0);
+            updateLogoutButton();
         }
 
-        // Timer for resend
-        let timer = 60;
-        setInterval(() => {
-            if (timer > 0) {
-                timer--;
+        function setActiveNav(index) {
+            document.querySelectorAll('.nav-link').forEach((link, i) => {
+                link.classList.toggle('active', i === index);
+            });
+        }
+
+        function updateLogoutButton() {
+            const logoutBtn = document.getElementById('logout-btn');
+            if (appState.token) {
+                logoutBtn.style.display = 'block';
+            } else {
+                logoutBtn.style.display = 'none';
             }
-        }, 1000);
+        }
+
+        function logout() {
+            appState.email = "";
+            appState.token = "";
+            sessionStorage.removeItem("userEmail");
+            sessionStorage.removeItem("userToken");
+            
+            if (appState.resendTimer) {
+                clearInterval(appState.resendTimer);
+                appState.resendTimer = null;
+            }
+            
+            showPage('page-home');
+            updateLogoutButton();
+        }
+
+        // ── Запрос кода ────────────────────────────────────────────
+        async function requestCode() {
+            const emailInput = document.getElementById("auth-email");
+            const email = emailInput.value.trim().toLowerCase();
+            
+            if (!email || !isValidEmail(email)) {
+                showError("Введите корректный email");
+                return;
+            }
+
+            const btn = document.getElementById("request-code-btn");
+            btn.disabled = true;
+            btn.textContent = "Отправка…";
+
+            try {
+                const res = await fetch(API_GATEWAY_URL + "/request-code", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({email})
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    appState.email = email;
+                    sessionStorage.setItem("userEmail", email);
+                    
+                    document.getElementById("verify-email-display").textContent = email;
+                    document.getElementById("verify-code-input").value = "";
+                    
+                    showPage("page-keys-code");
+                    startResendTimer();
+                } else {
+                    showError("Ошибка: " + (data.error || "Неизвестная ошибка"));
+                }
+            } catch(e) {
+                showError("Не удалось подключиться к серверу. Проверьте подключение к интернету.");
+                console.error("Network error:", e);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Отправить код";
+            }
+        }
+
+        // ── Верификация кода ───────────────────────────────────────
+        async function verifyCode() {
+            const codeInput = document.getElementById("verify-code-input");
+            const code = codeInput.value.trim();
+            
+            if (!code || code.length !== 6) {
+                showError("Введите 6-значный код");
+                return;
+            }
+
+            const btn = document.getElementById("verify-code-btn");
+            btn.disabled = true;
+            btn.textContent = "Проверка…";
+
+            try {
+                const res = await fetch(API_GATEWAY_URL + "/verify-code", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        email: appState.email,
+                        code: code
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok && data.token) {
+                    appState.token = data.token;
+                    sessionStorage.setItem("userToken", data.token);
+                    
+                    if (appState.resendTimer) {
+                        clearInterval(appState.resendTimer);
+                        appState.resendTimer = null;
+                    }
+                    
+                    updateLogoutButton();
+                    document.getElementById("user-email-display").textContent = appState.email;
+                    await loadKeys();
+                    showPage("page-keys-list");
+                } else {
+                    showError(data.error || "Неверный код");
+                    codeInput.value = "";
+                    codeInput.focus();
+                }
+            } catch(e) {
+                showError("Не удалось подключиться к серверу. Проверьте подключение к интернету.");
+                console.error("Network error:", e);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Подтвердить";
+            }
+        }
+
+        // ── Таймер повторной отправки ──────────────────────────────
+        function startResendTimer() {
+            const btn = document.getElementById("resend-code-btn");
+            const timerEl = document.getElementById("timer-seconds");
+            const timerContainer = document.getElementById("resend-timer");
+            
+            btn.disabled = true;
+            timerContainer.style.display = "block";
+            
+            let remaining = appState.resendCooldown;
+            timerEl.textContent = remaining;
+            
+            if (appState.resendTimer) {
+                clearInterval(appState.resendTimer);
+            }
+            
+            appState.resendTimer = setInterval(() => {
+                remaining--;
+                timerEl.textContent = remaining;
+                
+                if (remaining <= 0) {
+                    clearInterval(appState.resendTimer);
+                    appState.resendTimer = null;
+                    btn.disabled = false;
+                    timerContainer.style.display = "none";
+                }
+            }, 1000);
+        }
+
+        // ── Загрузка ключей ────────────────────────────────────────
+        async function loadKeys() {
+            if (!appState.token) {
+                showPage("page-keys");
+                return;
+            }
+
+            document.getElementById("user-email-display").textContent = appState.email;
+            const list = document.getElementById("keys-list");
+            list.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Загрузка ключей...</p>';
+
+            try {
+                const res = await fetch(API_GATEWAY_URL + "/get-keys", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({token: appState.token})
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok && data.keys && data.keys.length > 0) {
+                    list.innerHTML = data.keys.map(k => {
+                        return `
+                        <div class="key-item">
+                            <span class="key-code">${escapeHtml(k.key)}</span>
+                            <div class="key-actions">
+                                <button class="btn-small" onclick="copyKey('${escapeHtml(k.key)}')">Копировать</button>
+                                <button class="btn-small" onclick="setKeyForDetach('${escapeHtml(k.key)}'); showPage('page-unbind')">Отвязать</button>
+                            </div>
+                        </div>
+                    `;}).join('');
+                } else if (res.ok && (!data.keys || data.keys.length === 0)) {
+                    list.innerHTML = '<p style="color: var(--text-muted);">Ключи не найдены. Купите первый ключ!</p>';
+                } else {
+                    if (res.status === 401) {
+                        logout();
+                        showError("Сессия истекла. Пожалуйста, войдите снова.");
+                    } else {
+                        list.innerHTML = '<p style="color: var(--text-muted);">Ошибка: ' + escapeHtml(data.error || 'Неизвестная') + '</p>';
+                    }
+                }
+            } catch(e) {
+                list.innerHTML = '<p style="color: var(--text-muted);">Ошибка загрузки. Попробуйте позже.</p>';
+                console.error("Load keys error:", e);
+            }
+        }
+
+        // ── Копирование ключа ──────────────────────────────────────
+        function copyKey(key) {
+            navigator.clipboard.writeText(key).then(() => {
+                showSuccess("Ключ скопирован!");
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = key;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showSuccess("Ключ скопирован!");
+            });
+        }
+
+        // ── Отправка ключей на email ───────────────────────────────
+        async function restoreKeys() {
+            if (!appState.token) {
+                showError("Необходима авторизация");
+                return;
+            }
+
+            try {
+                const res = await fetch(API_GATEWAY_URL + "/restore-keys", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({token: appState.token})
+                });
+                const data = await res.json();
+                if (data.count > 0) {
+                    showSuccess(`Отправлено ${data.count} ключей на ${appState.email}. Проверьте почту (и папку Спам).`);
+                } else {
+                    showError("Ключи не найдены для этого email.");
+                }
+            } catch(e) {
+                showError("Не удалось отправить ключи. Попробуйте позже.");
+                console.error("Restore keys error:", e);
+            }
+        }
+
+        // ── Отвязка ключа ─────────────────────────────────────────
+        function setKeyForDetach(key) {
+            document.getElementById("transfer-key-input").value = key;
+        }
+
+        async function performDetach() {
+            const keyInput = document.getElementById("transfer-key-input");
+            const key = keyInput.value.trim().toUpperCase();
+            
+            if (!key) {
+                showError("Введите ключ");
+                return;
+            }
+            
+            if (!isValidKeyFormat(key)) {
+                showError("Некорректный формат ключа. Ожидается: ZRL-XXXX-XXXX-XXXX");
+                return;
+            }
+            
+            if (!appState.token) {
+                showError("Необходима авторизация");
+                showPage("page-keys");
+                return;
+            }
+
+            if (!confirm("Вы уверены? Ключ перестанет работать на текущем устройстве.")) {
+                return;
+            }
+
+            const btn = document.getElementById("detach-btn");
+            btn.disabled = true;
+            btn.textContent = "Отвязка…";
+
+            try {
+                const res = await fetch(API_GATEWAY_URL + "/manage-key", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        token: appState.token,
+                        key: key,
+                        action: "detach"
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    showSuccess(data.message || "Ключ успешно отвязан");
+                    keyInput.value = "";
+                    
+                    if (!document.getElementById("page-keys-list").classList.contains("hidden")) {
+                        await loadKeys();
+                    }
+                    showPage("page-keys-list");
+                } else {
+                    showError("Ошибка: " + (data.error || "Неизвестная ошибка"));
+                }
+            } catch(e) {
+                showError("Не удалось отвязать ключ. Попробуйте позже.");
+                console.error("Detach error:", e);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Отвязать ключ";
+            }
+        }
+
+        // ── Оплата ─────────────────────────────────────────────────
+        async function goPayment() {
+            const email = document.getElementById("buy-email").value.trim();
+            if (!email || !isValidEmail(email)) {
+                showError("Введите корректный email");
+                return;
+            }
+            const btn = document.getElementById("buy-button");
+            btn.disabled = true;
+            btn.textContent = "Создание…";
+            try {
+                const res = await fetch(API_GATEWAY_URL + "/create-payment", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({email})
+                });
+                const data = await res.json();
+                if (data.confirmation_url) {
+                    window.location.href = data.confirmation_url;
+                } else {
+                    showError("Ошибка: " + (data.error || "Неизвестная"));
+                    btn.disabled = false;
+                    btn.textContent = "Перейти к оплате — 99 ₽";
+                }
+            } catch(e) {
+                showError("Не удалось создать платёж. Попробуйте позже.");
+                console.error("Payment error:", e);
+                btn.disabled = false;
+                btn.textContent = "Перейти к оплате — 99 ₽";
+            }
+        }
+
+        // ── Инициализация ──────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById("buy-button").addEventListener("click", goPayment);
+            
+            if (appState.token && appState.email) {
+                document.getElementById("logout-btn").style.display = 'block';
+                document.getElementById("user-email-display").textContent = appState.email;
+            }
+            
+            updateLogoutButton();
+        });
     </script>
 </body>
 </html>
-
