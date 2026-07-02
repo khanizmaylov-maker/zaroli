@@ -890,7 +890,7 @@
                     </div>
                 </div>
 
-                <button class="btn-primary" onclick="showPage('page-buy')">Купить ключ — 99 ₽</button>
+                <button class="btn-primary" onclick="showPage('page-buy')">Купить ключ — 99&nbsp;₽</button>
             </div>
 
             <div style="text-align: center; margin-top: 35px;">
@@ -911,7 +911,7 @@
                     <input type="email" id="buy-email" class="form-input" placeholder="your@email.com">
                 </div>
                 
-                <button class="btn-primary" id="buy-button" style="width: 100%; text-align: center;">Перейти к оплате — 99 ₽</button>
+                <button class="btn-primary" id="buy-button" style="width: 100%; text-align: center;">Перейти к оплате — 99&nbsp;₽</button>
                 
                 <p class="card-text" style="text-align: center; margin-top: 25px; font-size: 14px;">
                     Ключ придёт на email после оплаты.
@@ -1452,7 +1452,7 @@
                 } else {
                     showError("Ошибка: " + (data.error || "Неизвестная"));
                     btn.disabled = false;
-                    btn.textContent = "Перейти к оплате — 99 ₽";
+                    btn.textContent = "Перейти к оплате — 99\u00A0₽";
                 }
             } catch(e) {
                 showError("Не удалось создать платёж. Попробуйте позже.");
